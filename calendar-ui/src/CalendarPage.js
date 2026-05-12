@@ -17,7 +17,7 @@ function App() {
   const [deleteInput, setDeleteInput] = useState("");
 
   // ======================
-  // 📅 HAE VARAUKSET
+  //  HAE VARAUKSET
   // ======================
   const loadBookings = async () => {
     setLoading(true);
