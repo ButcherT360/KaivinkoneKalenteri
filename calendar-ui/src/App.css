@@ -72,13 +72,28 @@
   cursor: pointer;
 }
 
-.free {
+.free:hover {
   background-color: #d4f8d4;
+  cursor: pointer;
+}
+.booked {
+  background-color: hsl(0, 0%, 100%) !important;
+}
+.booked:hover {
+  background-color: #ffd6d6 !important;
+  cursor: not-allowed;
 }
 
-.booked {
-  background-color: #ffd6d6;
+.bookingItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px;
+  margin: 5px 0;
+  background-color: #f5f5f5;
+  border-radius: 6px;
 }
+
 @keyframes App-logo-spin {
   from {
     transform: rotate(0deg);
