@@ -10,7 +10,7 @@ app.use(express.json());
 // tietokanta
 const db = new sqlite3.Database("bookings.db");
 
-// 🔹 luo taulu
+// luo taulu
 db.run(`
   CREATE TABLE IF NOT EXISTS bookings (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -20,7 +20,7 @@ db.run(`
   )
 `);
 
-// 🔹 HAE KAIKKI
+// HAE KAIKKI
 app.get("/bookings", (req, res) => {
   db.all("SELECT * FROM bookings", [], (err, rows) => {
     if (err) {
@@ -32,7 +32,7 @@ app.get("/bookings", (req, res) => {
   });
 });
 
-// 🔹 LISÄÄ VARAUS (EI pakoteta deleteCodea frontendissä virheellisesti)
+// LISÄÄ VARAUS 
 app.post("/bookings", (req, res) => {
   const { date, name, deleteCode } = req.body;
 
@@ -67,7 +67,7 @@ app.post("/bookings", (req, res) => {
   );
 });
 
-// 🔥 FIX: DELETE ilman body-probleemia (varmin tapa)
+// DELETE 
 app.delete("/bookings/:id", (req, res) => {
   const code = req.query.code;
 
@@ -102,7 +102,7 @@ app.delete("/bookings/:id", (req, res) => {
   );
 });
 
-// 🔥 START
+// START
 const PORT = process.env.PORT || 3000;
 
 app.listen(PORT, () => {

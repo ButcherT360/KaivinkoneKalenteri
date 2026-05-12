@@ -7,7 +7,7 @@ import "./App.css";
 function App() {
   const [events, setEvents] = useState([]);
 
-  // 🔹 hae varaukset backendistä
+  //  hae varaukset backendistä
   useEffect(() => {
     fetch("http://localhost:3000/bookings")
       .then(res => res.json())
@@ -24,7 +24,7 @@ function App() {
       .catch(err => console.log("FETCH ERROR:", err));
   }, []);
 
-  // 🔹 lisää varaus
+  //  lisää varaus
   function handleDateClick(info) {
     const name = prompt("Nimi:");
     if (!name) return;
@@ -63,7 +63,7 @@ function App() {
       .catch(err => console.log(err));
   }
 
-  // 🔥 POISTO KORJATTU
+  //  POISTO
   function handleEventClick(info) {
     const code = prompt("Anna poistokoodi:");
     if (!code) return;
