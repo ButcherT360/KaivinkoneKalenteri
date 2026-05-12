@@ -14,9 +14,9 @@ const db = new sqlite3.Database("bookings.db");
 db.run(`
   CREATE TABLE IF NOT EXISTS bookings (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    date TEXT,
-    name TEXT,
-    deleteCode TEXT
+    date TEXT NOT NULL,
+    name TEXT NOT NULL,
+    deleteCode TEXT NOT NULL
   )
 `);
 
@@ -24,15 +24,14 @@ db.run(`
 app.get("/bookings", (req, res) => {
   db.all("SELECT * FROM bookings", [], (err, rows) => {
     if (err) {
-      console.log(err);
-      return res.status(500).json([]);
+      return res.status(500).json({ error: "Database error" });
     }
 
     res.json(rows);
   });
 });
 
-// LISÄÄ VARAUS 
+// LISÄÄ VARAUS
 app.post("/bookings", (req, res) => {
   const { date, name, deleteCode } = req.body;
 
@@ -44,7 +43,9 @@ app.post("/bookings", (req, res) => {
     "SELECT * FROM bookings WHERE date = ?",
     [date],
     (err, row) => {
-      if (err) return res.status(500).json({ error: err.message });
+      if (err) {
+        return res.status(500).json({ error: err.message });
+      }
 
       if (row) {
         return res.status(400).json({ error: "Päivä on jo varattu" });
@@ -54,8 +55,11 @@ app.post("/bookings", (req, res) => {
         "INSERT INTO bookings (date, name, deleteCode) VALUES (?, ?, ?)",
         [date, name, deleteCode],
         function (err) {
-          if (err) return res.status(500).json({ error: err.message });
+          if (err) {
+            return res.status(500).json({ error: err.message });
+          }
 
+          // IMPORTANT: palauta myös deleteCode jos haluat debugata
           res.json({
             id: this.lastID,
             date,
@@ -67,9 +71,9 @@ app.post("/bookings", (req, res) => {
   );
 });
 
-// DELETE 
+// DELETE VARAUS
 app.delete("/bookings/:id", (req, res) => {
-  const code = req.query.code;
+  const code = req.body.code; // tärkeä
 
   if (!code) {
     return res.status(400).json({ error: "Missing code" });
@@ -79,23 +83,31 @@ app.delete("/bookings/:id", (req, res) => {
     "SELECT * FROM bookings WHERE id = ?",
     [req.params.id],
     (err, row) => {
-      if (err) return res.status(500).json({ error: err.message });
+      if (err) {
+        return res.status(500).json({ error: err.message });
+      }
 
       if (!row) {
         return res.status(404).json({ error: "Not found" });
       }
 
       if (row.deleteCode !== code) {
-        return res.status(403).json({ error: "Not allowed" });
+        return res.status(403).json({ error: "Wrong code" });
       }
 
       db.run(
         "DELETE FROM bookings WHERE id = ?",
         [req.params.id],
         function (err) {
-          if (err) return res.status(500).json({ error: err.message });
+          if (err) {
+            return res.status(500).json({ error: err.message });
+          }
 
-          res.json({ success: true });
+          // tärkeä: frontend ymmärtää tämän
+          res.json({
+            success: true,
+            deletedId: req.params.id
+          });
         }
       );
     }

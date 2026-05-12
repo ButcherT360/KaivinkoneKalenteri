@@ -7,107 +7,126 @@ import "./App.css";
 function App() {
   const [events, setEvents] = useState([]);
 
-  //  hae varaukset backendistä
-  useEffect(() => {
-    fetch("http://localhost:3000/bookings")
-      .then(res => res.json())
-      .then(data => {
-        const formatted = data.map(b => ({
+  const [showModal, setShowModal] = useState(false);
+  const [selectedDate, setSelectedDate] = useState("");
+  const [name, setName] = useState("");
+  const [deleteCode, setDeleteCode] = useState("");
+
+  const [deleteTarget, setDeleteTarget] = useState(null);
+  const [deleteInput, setDeleteInput] = useState("");
+
+  // hae varaukset
+  const loadBookings = async () => {
+    try {
+      const res = await fetch("http://localhost:3000/bookings");
+      const data = await res.json();
+
+      setEvents(
+        data.map(b => ({
           id: b.id,
           title: b.name,
-          date: b.date,
-          color: "red"
-        }));
+          start: b.date,
+          backgroundColor: "#a855f7",
+          borderColor: "#a855f7",
+          textColor: "#ffffff",
+          allDay: true
+        }))
+      );
+    } catch (err) {
+      console.log("LOAD ERROR:", err);
+    }
+  };
 
-        setEvents(formatted);
-      })
-      .catch(err => console.log("FETCH ERROR:", err));
+  useEffect(() => {
+    loadBookings();
   }, []);
 
-  //  lisää varaus
+  // päiväklikkaus
   function handleDateClick(info) {
-    const name = prompt("Nimi:");
-    if (!name) return;
-
-    const deleteCode = prompt("Aseta poistokoodi (muista tämä!)");
-    if (!deleteCode) return;
-
     const date = info.dateStr;
 
-    const exists = events.some(e => e.date === date);
-
+    const exists = events.some(e => e.start === date);
     if (exists) {
       alert("Tämä päivä on jo varattu!");
       return;
     }
 
-    fetch("http://localhost:3000/bookings", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({ date, name, deleteCode })
-    })
-      .then(res => res.json())
-      .then(saved => {
-        setEvents(prev => [
-          ...prev,
-          {
-            id: saved.id,
-            title: name,
-            date,
-            color: "red"
-          }
-        ]);
-      })
-      .catch(err => console.log(err));
+    setSelectedDate(date);
+    setShowModal(true);
   }
 
-  //  POISTO
-  function handleEventClick(info) {
-    const code = prompt("Anna poistokoodi:");
-    if (!code) return;
+  // tallenna varaus
+  async function saveBooking() {
+    if (!name || !deleteCode) {
+      alert("Täytä kaikki kentät");
+      return;
+    }
 
-    const id = info.event.id;
-
-    fetch(`http://localhost:3000/bookings/${id}?code=${code}`, {
-      method: "DELETE"
-    })
-      .then(async res => {
-        const data = await res.json();
-
-        if (!res.ok) {
-          alert(data.error);
-          return;
-        }
-
-        setEvents(prev =>
-          prev.filter(e => e.id !== id)
-
-        );
-        loadBookings();
-      })
-      .catch(err => console.log(err));
-  }
-
-
-  function loadBookings() {
-    fetch("http://localhost:3000/bookings")
-      .then(res => res.json())
-      .then(data => {
-        setEvents(
-          data.map(b => ({
-            id: b.id,
-            title: b.name,
-            date: b.date,
-            color: "red"
-          }))
-        );
+    try {
+      const res = await fetch("http://localhost:3000/bookings", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          date: selectedDate,
+          name,
+          deleteCode
+        })
       });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        alert(data.error);
+        return;
+      }
+
+      await loadBookings();
+
+      setShowModal(false);
+      setName("");
+      setDeleteCode("");
+      setSelectedDate("");
+    } catch (err) {
+      console.log("SAVE ERROR:", err);
+    }
   }
-  useEffect(() => {
-    loadBookings();
-  }, []);
+
+  // avaa delete-modal
+  function handleEventClick(info) {
+    setDeleteTarget(info.event);
+    setDeleteInput("");
+  }
+
+  // poisto
+  async function confirmDelete() {
+    if (!deleteTarget || !deleteInput) return;
+
+    try {
+      const res = await fetch(
+        `http://localhost:3000/bookings/${deleteTarget.id}`,
+        {
+          method: "DELETE",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ code: deleteInput })
+        }
+      );
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        alert(data.error);
+        return;
+      }
+
+      await loadBookings();
+
+      setDeleteTarget(null);
+      setDeleteInput("");
+    } catch (err) {
+      console.log("DELETE ERROR:", err);
+    }
+  }
+
   return (
     <div style={{ padding: 20 }}>
       <FullCalendar
@@ -116,7 +135,61 @@ function App() {
         events={events}
         dateClick={handleDateClick}
         eventClick={handleEventClick}
+        dayCellClassNames={(arg) => {
+          const date = arg.date.toLocaleDateString("sv-SE");
+          const booked = events.some(e => e.start === date);
+
+          return booked ? "booked" : "free";
+        }}
       />
+
+      {/* CREATE MODAL */}
+      {showModal && (
+        <div className="modalOverlay">
+          <div className="modal">
+            <h2>Uusi varaus</h2>
+
+            <p>Päivä: {selectedDate}</p>
+
+            <input
+              placeholder="Nimi"
+              value={name}
+              onChange={e => setName(e.target.value)}
+            />
+
+            <input
+              type="password"
+              placeholder="Poistokoodi"
+              value={deleteCode}
+              onChange={e => setDeleteCode(e.target.value)}
+            />
+
+            <button onClick={saveBooking}>Tallenna</button>
+            <button onClick={() => setShowModal(false)}>Peruuta</button>
+          </div>
+        </div>
+      )}
+
+      {/* DELETE MODAL */}
+      {deleteTarget && (
+        <div className="modalOverlay">
+          <div className="modal">
+            <h2>Poista varaus</h2>
+
+            <p>{deleteTarget.title}</p>
+
+            <input
+              type="password"
+              placeholder="Poistokoodi"
+              value={deleteInput}
+              onChange={e => setDeleteInput(e.target.value)}
+            />
+
+            <button onClick={confirmDelete}>Poista</button>
+            <button onClick={() => setDeleteTarget(null)}>Peruuta</button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
