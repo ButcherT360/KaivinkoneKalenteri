@@ -1,7 +1,5 @@
 node_modules
 .env
-calendar-ui/public/logo.png
-public/logo.png
 build
 dist
 *.db
