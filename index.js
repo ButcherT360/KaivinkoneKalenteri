@@ -4,32 +4,35 @@ const express = require("express");
 const Database = require("better-sqlite3");
 const cors = require("cors");
 const path = require("path");
+
 const app = express();
 
-app.use(express.static(path.join(__dirname, "build")));
-
-app.get("*", (req, res) => {
-  res.sendFile(path.join(__dirname, "build", "index.html"));
-});
-
-app.use(cors({
-  origin: "*"
-}));
+// =======================
+//  MIDDLEWARE (TÄRKEÄ JÄRJESTYS)
+// =======================
+app.use(cors({ origin: "*" }));
 app.use(express.json());
 
 
-// tietokanta
+// =======================
+//  STATIC FRONTEND (OPTIONAL)
+// =======================
+app.use(express.static(path.join(__dirname, "build")));
+
+
+// =======================
+//  DATABASE
+// =======================
 const db = new Database("bookings.db");
 
-// taulu
-db.run(`
+db.prepare(`
   CREATE TABLE IF NOT EXISTS bookings (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     date TEXT NOT NULL,
     name TEXT NOT NULL,
     deleteCode TEXT NOT NULL
   )
-`);
+`).run();
 
 
 // =======================
@@ -38,9 +41,7 @@ db.run(`
 app.post("/admin/login", (req, res) => {
   const { password } = req.body;
 
-  const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD;
-
-  if (password !== ADMIN_PASSWORD) {
+  if (password !== process.env.ADMIN_PASSWORD) {
     return res.status(401).json({ error: "Wrong password" });
   }
 
@@ -55,14 +56,12 @@ app.post("/admin/login", (req, res) => {
 
 
 // =======================
-//  ADMIN MIDDLEWARE
+//  ADMIN CHECK
 // =======================
 function requireAdmin(req, res, next) {
   const auth = req.headers.authorization;
 
-  if (!auth) {
-    return res.status(401).json({ error: "No token" });
-  }
+  if (!auth) return res.status(401).json({ error: "No token" });
 
   try {
     const token = auth.split(" ")[1];
@@ -73,23 +72,18 @@ function requireAdmin(req, res, next) {
     }
 
     next();
-  } catch (err) {
+  } catch {
     return res.status(403).json({ error: "Invalid token" });
   }
 }
 
 
 // =======================
-//  GET ALL BOOKINGS
+//  GET BOOKINGS
 // =======================
 app.get("/bookings", (req, res) => {
-  db.all("SELECT * FROM bookings", [], (err, rows) => {
-    if (err) {
-      return res.status(500).json({ error: "Database error" });
-    }
-
-    res.json(rows);
-  });
+  const rows = db.prepare("SELECT * FROM bookings").all();
+  res.json(rows);
 });
 
 
@@ -103,85 +97,71 @@ app.post("/bookings", (req, res) => {
     return res.status(400).json({ error: "Missing data" });
   }
 
-  db.get(
-    "SELECT * FROM bookings WHERE date = ?",
-    [date],
-    (err, row) => {
-      if (err) {
-        return res.status(500).json({ error: err.message });
-      }
+  const exists = db.prepare("SELECT * FROM bookings WHERE date = ?").get(date);
 
-      if (row) {
-        return res.status(400).json({ error: "Päivä on jo varattu" });
-      }
+  if (exists) {
+    return res.status(400).json({ error: "Päivä on jo varattu" });
+  }
 
-      db.run(
-        "INSERT INTO bookings (date, name, deleteCode) VALUES (?, ?, ?)",
-        [date, name, deleteCode],
-        function (err) {
-          if (err) {
-            return res.status(500).json({ error: err.message });
-          }
-
-          res.json({
-            id: this.lastID,
-            date,
-            name
-          });
-        }
-      );
-    }
+  const stmt = db.prepare(
+    "INSERT INTO bookings (date, name, deleteCode) VALUES (?, ?, ?)"
   );
+
+  const result = stmt.run(date, name, deleteCode);
+
+  res.json({
+    id: result.lastInsertRowid,
+    date,
+    name
+  });
 });
 
 
 // =======================
 //  DELETE BOOKING
 // =======================
-// ADMIN ohittaa koodin, USER tarvitsee deleteCode
 app.delete("/bookings/:id", (req, res) => {
-  const code = req.body?.code; // 👈 tärkeä (ei kaadu jos undefined)
+  const code = req.body?.code;
   const auth = req.headers.authorization;
 
   const isAdmin = auth && auth.startsWith("Bearer ");
 
-  db.get(
-    "SELECT * FROM bookings WHERE id = ?",
-    [req.params.id],
-    (err, row) => {
-      if (err) return res.status(500).json({ error: err.message });
-      if (!row) return res.status(404).json({ error: "Not found" });
+  const row = db.prepare("SELECT * FROM bookings WHERE id = ?").get(req.params.id);
 
-      //  ADMIN OHITUS
-      if (!isAdmin) {
-        if (!code) {
-          return res.status(400).json({ error: "Missing code" });
-        }
+  if (!row) {
+    return res.status(404).json({ error: "Not found" });
+  }
 
-        if (row.deleteCode !== code) {
-          return res.status(403).json({ error: "Wrong code" });
-        }
-      }
-
-      db.run(
-        "DELETE FROM bookings WHERE id = ?",
-        [req.params.id],
-        function (err) {
-          if (err) return res.status(500).json({ error: err.message });
-
-          res.json({
-            success: true,
-            deletedId: req.params.id
-          });
-        }
-      );
+  // ADMIN OHITUS
+  if (!isAdmin) {
+    if (!code) {
+      return res.status(400).json({ error: "Missing code" });
     }
-  );
+
+    if (row.deleteCode !== code) {
+      return res.status(403).json({ error: "Wrong code" });
+    }
+  }
+
+  db.prepare("DELETE FROM bookings WHERE id = ?").run(req.params.id);
+
+  res.json({
+    success: true,
+    deletedId: req.params.id
+  });
 });
 
 
 // =======================
-//  START SERVER
+//  FALLBACK (FIXED - EI '*' ROUTEA)
+// =======================
+app.use((req, res) => {
+  res.status(404).json({ error: "Not found" });
+});
+
+
+// =======================
+//  START
 // =======================
 const PORT = process.env.PORT || 3000;
 
