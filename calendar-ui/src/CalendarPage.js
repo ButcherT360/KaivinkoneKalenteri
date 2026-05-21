@@ -5,6 +5,9 @@ import interactionPlugin from "@fullcalendar/interaction";
 import fiLocale from "@fullcalendar/core/locales/fi";
 import "./App.css";
 
+// 🌐 API URL (Vercel + Render)
+const API = process.env.REACT_APP_API_URL;
+
 function App() {
   const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -24,7 +27,7 @@ function App() {
     setLoading(true);
 
     try {
-      const res = await fetch("https://kaivinkonekalenteri.onrender.com/bookings");
+      const res = await fetch(`${API}/bookings`);
       const data = await res.json();
 
       setEvents(
@@ -76,7 +79,7 @@ function App() {
     }
 
     try {
-      const res = await fetch("https://kaivinkonekalenteri.onrender.com/3000/bookings", {
+      const res = await fetch(`${API}/bookings`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -112,7 +115,7 @@ function App() {
 
     try {
       const res = await fetch(
-        `https://kaivinkonekalenteri.onrender.com/bookings/${deleteTarget.id}`,
+        `${API}/bookings/${deleteTarget.id}`,
         {
           method: "DELETE",
           headers: { "Content-Type": "application/json" },
@@ -140,6 +143,7 @@ function App() {
     <div style={{ padding: 20 }}>
 
       <h1>Kaivurin vuokrauskalenteri</h1>
+
       <div
         style={{
           display: "flex",
@@ -173,42 +177,9 @@ function App() {
             events={events}
             dateClick={handleDateClick}
             eventClick={(info) => setDeleteTarget(info.event)}
-
-            dayCellClassNames={(arg) => {
-              const date = arg.date.toLocaleDateString("sv-SE");
-
-              const isBooked = events.some(
-                (e) => e.start === date
-              );
-
-              return isBooked ? "booked" : "free";
-            }}
-
-            // ======================
-            //  CELL CONTENT
-            // ======================
-            dayCellContent={(arg) => {
-              const date = arg.date.toLocaleDateString("sv-SE");
-
-              const isBooked = events.some((e) => e.start === date);
-
-              return (
-                <div>
-                  <div>{arg.dayNumberText}</div>
-
-                  {isBooked && (
-                    <div style={{ fontSize: "12px", color: "red" }}>
-                      VARATTU
-                    </div>
-                  )}
-                </div>
-              );
-            }}
           />
 
-          {/* ======================
-           VARAUSLISTA
-      ====================== */}
+          {/* VARAUSLISTA */}
           <h2>Varaukset</h2>
 
           {events.length === 0 ? (
@@ -225,9 +196,7 @@ function App() {
             ))
           )}
 
-          {/* ======================
-           CREATE MODAL
-      ====================== */}
+          {/* CREATE MODAL */}
           {showModal && (
             <div className="modalOverlay">
               <div className="modal">
@@ -254,9 +223,7 @@ function App() {
             </div>
           )}
 
-          {/* ======================
-           DELETE MODAL
-      ====================== */}
+          {/* DELETE MODAL */}
           {deleteTarget && (
             <div className="modalOverlay">
               <div className="modal">

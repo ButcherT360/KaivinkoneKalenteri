@@ -1,5 +1,8 @@
 import { useState } from "react";
 
+// 🌐 API URL
+const API = process.env.REACT_APP_API_URL;
+
 export default function AdminLogin({ onLogin }) {
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
@@ -15,10 +18,14 @@ export default function AdminLogin({ onLogin }) {
     setError("");
 
     try {
-      const res = await fetch("https://kaivinkonekalenteri.onrender.com/admin/login", {
+      const res = await fetch(`${API}/admin/login`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ password: input })
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          password: input
+        })
       });
 
       const data = await res.json();
@@ -31,7 +38,7 @@ export default function AdminLogin({ onLogin }) {
       // 🔥 tallenna token
       localStorage.setItem("token", data.token);
 
-      // optional flag UI:lle
+      // optional UI flag
       localStorage.setItem("admin", "true");
 
       onLogin(true);
@@ -39,6 +46,7 @@ export default function AdminLogin({ onLogin }) {
     } catch (err) {
       console.log(err);
       setError("Server error");
+
     } finally {
       setLoading(false);
     }
@@ -46,6 +54,7 @@ export default function AdminLogin({ onLogin }) {
 
   return (
     <div style={{ padding: 20 }}>
+
       <h2>Admin login</h2>
 
       <input
@@ -56,15 +65,24 @@ export default function AdminLogin({ onLogin }) {
         disabled={loading}
       />
 
-      <button onClick={login} disabled={loading}>
+      <button
+        onClick={login}
+        disabled={loading}
+      >
         {loading ? "Kirjaudutaan..." : "Kirjaudu"}
       </button>
 
       {error && (
-        <p style={{ color: "red", marginTop: 10 }}>
+        <p
+          style={{
+            color: "red",
+            marginTop: 10
+          }}
+        >
           {error}
         </p>
       )}
+
     </div>
   );
 }

@@ -1,20 +1,24 @@
 import { useEffect, useState } from "react";
 import AdminLogin from "./AdminLogin";
 
+// 🌐 API URL
+const API = process.env.REACT_APP_API_URL;
+
 function AdminPage() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(false);
   const [deleteTarget, setDeleteTarget] = useState(null);
 
-  const API = "https://kaivinkonekalenteri.onrender.com";
-
   // ======================
   //  LOGIN CHECK
   // ======================
   useEffect(() => {
     const token = localStorage.getItem("token");
-    if (token) setIsLoggedIn(true);
+
+    if (token) {
+      setIsLoggedIn(true);
+    }
   }, []);
 
   // ======================
@@ -28,8 +32,10 @@ function AdminPage() {
       const data = await res.json();
 
       setEvents(data);
+
     } catch (err) {
       console.log("LOAD ERROR:", err);
+
     } finally {
       setLoading(false);
     }
@@ -55,8 +61,7 @@ function AdminPage() {
           headers: {
             "Content-Type": "application/json",
             Authorization: "Bearer " + localStorage.getItem("token")
-          },
-          // admin ei tarvitse codea → ei bodya
+          }
         }
       );
 
@@ -93,6 +98,7 @@ function AdminPage() {
   // ======================
   return (
     <div style={{ padding: 20 }}>
+
       <h1>Admin - Varaukset</h1>
 
       <button
@@ -106,32 +112,42 @@ function AdminPage() {
 
       {loading && <p>Ladataan...</p>}
 
-      {!loading && events.length === 0 && <p>Ei varauksia</p>}
+      {!loading && events.length === 0 && (
+        <p>Ei varauksia</p>
+      )}
 
       {events.map((event) => (
         <div key={event.id} className="bookingItem">
+
           <strong>{event.date}</strong> – {event.name}
 
           <button onClick={() => setDeleteTarget(event)}>
             Poista
           </button>
+
         </div>
       ))}
 
       {/* DELETE MODAL */}
       {deleteTarget && (
         <div className="modalOverlay">
+
           <div className="modal">
+
             <h2>Poista varaus</h2>
 
             <p>
               {deleteTarget.date} – {deleteTarget.name}
             </p>
 
-            <button onClick={confirmDelete}>Poista</button>
+            <button onClick={confirmDelete}>
+              Poista
+            </button>
+
             <button onClick={() => setDeleteTarget(null)}>
               Peruuta
             </button>
+
           </div>
         </div>
       )}
