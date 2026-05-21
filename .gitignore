@@ -1,0 +1,6 @@
+node_modules
+.env
+public/logo.png
+build
+dist
+*.db
