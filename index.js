@@ -3,11 +3,20 @@ const jwt = require("jsonwebtoken");
 const express = require("express");
 const sqlite3 = require("sqlite3").verbose();
 const cors = require("cors");
-
+const path = require("path");
 const app = express();
 
-app.use(cors());
+app.use(express.static(path.join(__dirname, "build")));
+
+app.get("*", (req, res) => {
+  res.sendFile(path.join(__dirname, "build", "index.html"));
+});
+
+app.use(cors({
+  origin: "*"
+}));
 app.use(express.json());
+
 
 // tietokanta
 const db = new sqlite3.Database("bookings.db");
@@ -177,5 +186,5 @@ app.delete("/bookings/:id", (req, res) => {
 const PORT = process.env.PORT || 3000;
 
 app.listen(PORT, () => {
-  console.log("Server running on http://localhost:" + PORT);
+  console.log("Server running on " + PORT);
 });
