@@ -24,7 +24,7 @@ function AdminPage() {
     setLoading(true);
 
     try {
-      const res = await fetch("http://localhost:3000/bookings");
+      const res = await fetch("https://kaivinkonekalenteri.onrender.com/3000/bookings");
       const data = await res.json();
 
       setEvents(data);
@@ -49,7 +49,7 @@ function AdminPage() {
 
     try {
       const res = await fetch(
-        `http://localhost:3000/bookings/${deleteTarget.id}`,
+        `https://kaivinkonekalenteri.onrender.com/bookings/${deleteTarget.id}`,
         {
           method: "DELETE",
           headers: {

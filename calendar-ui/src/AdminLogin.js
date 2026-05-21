@@ -8,7 +8,7 @@ export default function AdminLogin({ onLogin }) {
     setLoading(true);
 
     try {
-      const res = await fetch("http://localhost:3000/admin/login", {
+      const res = await fetch("https://kaivinkonekalenteri.onrender.com/admin/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ password: input })

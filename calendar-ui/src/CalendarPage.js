@@ -24,7 +24,7 @@ function App() {
     setLoading(true);
 
     try {
-      const res = await fetch("http://localhost:3000/bookings");
+      const res = await fetch("https://kaivinkonekalenteri.onrender.com/bookings");
       const data = await res.json();
 
       setEvents(
@@ -76,7 +76,7 @@ function App() {
     }
 
     try {
-      const res = await fetch("http://localhost:3000/bookings", {
+      const res = await fetch("https://kaivinkonekalenteri.onrender.com/3000/bookings", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -112,7 +112,7 @@ function App() {
 
     try {
       const res = await fetch(
-        `http://localhost:3000/bookings/${deleteTarget.id}`,
+        `https://kaivinkonekalenteri.onrender.com/bookings/${deleteTarget.id}`,
         {
           method: "DELETE",
           headers: { "Content-Type": "application/json" },
