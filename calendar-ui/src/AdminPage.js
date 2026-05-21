@@ -7,14 +7,14 @@ function AdminPage() {
   const [loading, setLoading] = useState(false);
   const [deleteTarget, setDeleteTarget] = useState(null);
 
+  const API = "https://kaivinkonekalenteri.onrender.com";
+
   // ======================
-  //  LOGIN CHECK (JWT)
+  //  LOGIN CHECK
   // ======================
   useEffect(() => {
     const token = localStorage.getItem("token");
-    if (token) {
-      setIsLoggedIn(true);
-    }
+    if (token) setIsLoggedIn(true);
   }, []);
 
   // ======================
@@ -24,7 +24,7 @@ function AdminPage() {
     setLoading(true);
 
     try {
-      const res = await fetch("https://kaivinkonekalenteri.onrender.com/3000/bookings");
+      const res = await fetch(`${API}/bookings`);
       const data = await res.json();
 
       setEvents(data);
@@ -42,21 +42,21 @@ function AdminPage() {
   }, [isLoggedIn]);
 
   // ======================
-  //  DELETE (ADMIN ONLY)
+  //  DELETE
   // ======================
   async function confirmDelete() {
     if (!deleteTarget) return;
 
     try {
       const res = await fetch(
-        `https://kaivinkonekalenteri.onrender.com/bookings/${deleteTarget.id}`,
+        `${API}/bookings/${deleteTarget.id}`,
         {
           method: "DELETE",
           headers: {
             "Content-Type": "application/json",
             Authorization: "Bearer " + localStorage.getItem("token")
           },
-          body: JSON.stringify({ code: "" }) // 👈 adminille tyhjä ok
+          // admin ei tarvitse codea → ei bodya
         }
       );
 
@@ -69,6 +69,7 @@ function AdminPage() {
 
       await loadBookings();
       setDeleteTarget(null);
+
     } catch (err) {
       console.log("DELETE ERROR:", err);
     }
@@ -80,8 +81,7 @@ function AdminPage() {
   if (!isLoggedIn) {
     return (
       <AdminLogin
-        onLogin={(token) => {
-          localStorage.setItem("token", token);
+        onLogin={() => {
           setIsLoggedIn(true);
         }}
       />
@@ -118,9 +118,7 @@ function AdminPage() {
         </div>
       ))}
 
-      {/* ======================
-           DELETE MODAL
-      ====================== */}
+      {/* DELETE MODAL */}
       {deleteTarget && (
         <div className="modalOverlay">
           <div className="modal">
