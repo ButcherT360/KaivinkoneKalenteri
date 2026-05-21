@@ -2,7 +2,6 @@ require("dotenv").config();
 const jwt = require("jsonwebtoken");
 const express = require("express");
 const Database = require("better-sqlite3");
-const db = new Database("bookings.db");
 const cors = require("cors");
 const path = require("path");
 const app = express();
@@ -20,7 +19,7 @@ app.use(express.json());
 
 
 // tietokanta
-const db = new sqlite3.Database("bookings.db");
+const db = new Database("bookings.db");
 
 // taulu
 db.run(`
