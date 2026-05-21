@@ -31,6 +31,7 @@ db.prepare(`
     name TEXT NOT NULL,
     deleteCode TEXT NOT NULL,
     ip TEXT
+    deviceId TEXT
   )
 `).run();
 
@@ -80,26 +81,44 @@ app.get("/bookings", (req, res) => {
 //  CREATE BOOKING (IP CHECK LISÄTTY)
 // =======================
 app.post("/bookings", (req, res) => {
-  const { date, name, deleteCode } = req.body;
+  const { date, name, deleteCode, deviceId } = req.body;
 
-  if (!date || !name || !deleteCode) {
+  if (!date || !name || !deleteCode || !deviceId) {
     return res.status(400).json({ error: "Missing data" });
   }
 
   const ip = getIP(req);
 
-  // 🔥 ESTÄ SAMA IP UUDELLEEN
-  const ipExists = db.prepare(
-    "SELECT * FROM bookings WHERE ip = ?"
-  ).get(ip);
-
-  if (ipExists) {
-    return res.status(400).json({
-      error: "Olet jo tehnyt varauksen"
+  // 🔥 RATE LIMIT
+  if (isRateLimited(ip)) {
+    return res.status(429).json({
+      error: "Liikaa varauksia lyhyessä ajassa"
     });
   }
 
-  // 🔥 ESTÄ SAMA PÄIVÄ
+  // 🔥 1. sama deviceId ei voi varata uudelleen
+  const deviceExists = db.prepare(
+    "SELECT * FROM bookings WHERE deviceId = ? AND date = ?"
+  ).get(deviceId, date);
+
+  if (deviceExists) {
+    return res.status(400).json({
+      error: "Olet jo varannut tämän päivän"
+    });
+  }
+
+  // 🔥 2. sama IP + päivä (backup)
+  const ipExists = db.prepare(
+    "SELECT * FROM bookings WHERE ip = ? AND date = ?"
+  ).get(ip, date);
+
+  if (ipExists) {
+    return res.status(400).json({
+      error: "Olet jo varannut tämän päivän"
+    });
+  }
+
+  // 🔥 3. päivä varattu check
   const exists = db.prepare(
     "SELECT * FROM bookings WHERE date = ?"
   ).get(date);
@@ -110,17 +129,31 @@ app.post("/bookings", (req, res) => {
     });
   }
 
-  const stmt = db.prepare(
-    "INSERT INTO bookings (date, name, deleteCode, ip) VALUES (?, ?, ?, ?)"
-  );
+  // 🔥 insert
+  const stmt = db.prepare(`
+    INSERT INTO bookings (date, name, deleteCode, ip, deviceId)
+    VALUES (?, ?, ?, ?, ?)
+  `);
 
-  const result = stmt.run(date, name, deleteCode, ip);
+  const result = stmt.run(date, name, deleteCode, ip, deviceId);
 
   res.json({
     id: result.lastInsertRowid,
     date,
     name
   });
+});
+
+const stmt = db.prepare(
+  "INSERT INTO bookings (date, name, deleteCode, ip) VALUES (?, ?, ?, ?)"
+);
+
+const result = stmt.run(date, name, deleteCode, ip);
+
+res.json({
+  id: result.lastInsertRowid,
+  date,
+  name
 });
 
 

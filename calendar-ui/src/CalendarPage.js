@@ -20,6 +20,21 @@ function App() {
   const [deleteTarget, setDeleteTarget] = useState(null);
   const [deleteInput, setDeleteInput] = useState("");
 
+
+
+  // DEVICE ID
+  const [deviceId] = useState(() => {
+    const saved = localStorage.getItem("deviceId");
+
+    if (saved) return saved;
+
+    const id = crypto.randomUUID();
+    localStorage.setItem("deviceId", id);
+
+    return id;
+  });
+
+  localStorage.setItem("deviceId", deviceId);
   // ======================
   //  HAE VARAUKSET
   // ======================
@@ -85,7 +100,8 @@ function App() {
         body: JSON.stringify({
           date: selectedDate,
           name,
-          deleteCode
+          deleteCode,
+          deviceId
         })
       });
 
