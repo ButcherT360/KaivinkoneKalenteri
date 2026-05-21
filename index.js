@@ -14,27 +14,54 @@ app.use(cors({ origin: "*" }));
 app.use(express.json());
 
 // =======================
-//  STATIC FRONTEND
+//  STATIC
 // =======================
 app.use(express.static(path.join(__dirname, "build")));
 
 // =======================
-//  DATABASE
+//  DB
 // =======================
 const db = new Database("bookings.db");
 
-// 🔥 LISÄTTY ip KENTTÄ
 db.prepare(`
   CREATE TABLE IF NOT EXISTS bookings (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     date TEXT NOT NULL,
     name TEXT NOT NULL,
     deleteCode TEXT NOT NULL,
-    ip TEXT
+    ip TEXT,
     deviceId TEXT
   )
 `).run();
 
+// =======================
+//  HELPERS
+// =======================
+function getIP(req) {
+  return (
+    req.headers["x-forwarded-for"] ||
+    req.socket.remoteAddress ||
+    ""
+  );
+}
+
+const rateMap = new Map();
+
+function isRateLimited(ip) {
+  const now = Date.now();
+  const windowMs = 10 * 60 * 1000;
+  const limit = 1;
+
+  const user = rateMap.get(ip) || [];
+  const recent = user.filter(t => now - t < windowMs);
+
+  if (recent.length >= limit) return true;
+
+  recent.push(now);
+  rateMap.set(ip, recent);
+
+  return false;
+}
 
 // =======================
 //  ADMIN LOGIN
@@ -55,19 +82,6 @@ app.post("/admin/login", (req, res) => {
   res.json({ token });
 });
 
-
-// =======================
-//  GET IP HELPER
-// =======================
-function getIP(req) {
-  return (
-    req.headers["x-forwarded-for"] ||
-    req.socket.remoteAddress ||
-    ""
-  );
-}
-
-
 // =======================
 //  GET BOOKINGS
 // =======================
@@ -76,9 +90,8 @@ app.get("/bookings", (req, res) => {
   res.json(rows);
 });
 
-
 // =======================
-//  CREATE BOOKING (IP CHECK LISÄTTY)
+//  CREATE BOOKING (FINAL CLEAN)
 // =======================
 app.post("/bookings", (req, res) => {
   const { date, name, deleteCode, deviceId } = req.body;
@@ -89,14 +102,14 @@ app.post("/bookings", (req, res) => {
 
   const ip = getIP(req);
 
-  // 🔥 RATE LIMIT
+  // rate limit
   if (isRateLimited(ip)) {
     return res.status(429).json({
       error: "Liikaa varauksia lyhyessä ajassa"
     });
   }
 
-  // 🔥 1. sama deviceId ei voi varata uudelleen
+  // device check
   const deviceExists = db.prepare(
     "SELECT * FROM bookings WHERE deviceId = ? AND date = ?"
   ).get(deviceId, date);
@@ -107,7 +120,7 @@ app.post("/bookings", (req, res) => {
     });
   }
 
-  // 🔥 2. sama IP + päivä (backup)
+  // ip check
   const ipExists = db.prepare(
     "SELECT * FROM bookings WHERE ip = ? AND date = ?"
   ).get(ip, date);
@@ -118,7 +131,7 @@ app.post("/bookings", (req, res) => {
     });
   }
 
-  // 🔥 3. päivä varattu check
+  // day check
   const exists = db.prepare(
     "SELECT * FROM bookings WHERE date = ?"
   ).get(date);
@@ -129,7 +142,6 @@ app.post("/bookings", (req, res) => {
     });
   }
 
-  // 🔥 insert
   const stmt = db.prepare(`
     INSERT INTO bookings (date, name, deleteCode, ip, deviceId)
     VALUES (?, ?, ?, ?, ?)
@@ -144,21 +156,8 @@ app.post("/bookings", (req, res) => {
   });
 });
 
-const stmt = db.prepare(
-  "INSERT INTO bookings (date, name, deleteCode, ip) VALUES (?, ?, ?, ?)"
-);
-
-const result = stmt.run(date, name, deleteCode, ip);
-
-res.json({
-  id: result.lastInsertRowid,
-  date,
-  name
-});
-
-
 // =======================
-//  DELETE BOOKING
+//  DELETE
 // =======================
 app.delete("/bookings/:id", (req, res) => {
   const code = req.body?.code;
@@ -174,27 +173,18 @@ app.delete("/bookings/:id", (req, res) => {
     return res.status(404).json({ error: "Not found" });
   }
 
-  // ADMIN OHITUS
   if (!isAdmin) {
-    if (!code) {
-      return res.status(400).json({ error: "Missing code" });
-    }
+    if (!code) return res.status(400).json({ error: "Missing code" });
 
     if (row.deleteCode !== code) {
       return res.status(403).json({ error: "Wrong code" });
     }
   }
 
-  db.prepare(
-    "DELETE FROM bookings WHERE id = ?"
-  ).run(req.params.id);
+  db.prepare("DELETE FROM bookings WHERE id = ?").run(req.params.id);
 
-  res.json({
-    success: true,
-    deletedId: req.params.id
-  });
+  res.json({ success: true, deletedId: req.params.id });
 });
-
 
 // =======================
 //  404
@@ -203,97 +193,6 @@ app.use((req, res) => {
   res.status(404).json({ error: "Not found" });
 });
 
-// =======================
-//  SIMPLE MEMORY RATE LIMIT
-// =======================
-const rateMap = new Map();
-
-function isRateLimited(ip) {
-  const now = Date.now();
-  const windowMs = 10 * 60 * 1000; // 10 min
-  const limit = 1; // 1 varaus / 10 min
-
-  const user = rateMap.get(ip) || [];
-
-  const recent = user.filter(t => now - t < windowMs);
-
-  if (recent.length >= limit) {
-    return true;
-  }
-
-  recent.push(now);
-  rateMap.set(ip, recent);
-
-  return false;
-}
-
-// =======================
-//  IMPROVED IP
-// =======================
-function getIP(req) {
-  return (
-    req.headers["x-forwarded-for"] ||
-    req.socket.remoteAddress ||
-    ""
-  );
-}
-
-// =======================
-//  CREATE BOOKING (ANTI-SPAM VERSION)
-// =======================
-app.post("/bookings", (req, res) => {
-  const { date, name, deleteCode } = req.body;
-
-  if (!date || !name || !deleteCode) {
-    return res.status(400).json({ error: "Missing data" });
-  }
-
-  const ip = getIP(req);
-  const userAgent = req.headers["user-agent"] || "";
-
-  // 🔥 1. RATE LIMIT
-  if (isRateLimited(ip)) {
-    return res.status(429).json({
-      error: "Liikaa varauksia lyhyessä ajassa"
-    });
-  }
-
-  // 🔥 2. IP + DAY CHECK
-  const ipDayExists = db.prepare(
-    "SELECT * FROM bookings WHERE ip = ? AND date = ?"
-  ).get(ip, date);
-
-  if (ipDayExists) {
-    return res.status(400).json({
-      error: "Olet jo varannut tämän päivän"
-    });
-  }
-
-  // 🔥 3. GLOBAL DAY CHECK
-  const exists = db.prepare(
-    "SELECT * FROM bookings WHERE date = ?"
-  ).get(date);
-
-  if (exists) {
-    return res.status(400).json({
-      error: "Päivä on jo varattu"
-    });
-  }
-
-  // 🔥 4. INSERT (fingerprint mukana)
-  const stmt = db.prepare(`
-    INSERT INTO bookings (date, name, deleteCode, ip)
-    VALUES (?, ?, ?, ?)
-  `);
-
-  const result = stmt.run(date, name, deleteCode, ip);
-
-  res.json({
-    id: result.lastInsertRowid,
-    date,
-    name
-  });
-});
 // =======================
 //  START
 // =======================
