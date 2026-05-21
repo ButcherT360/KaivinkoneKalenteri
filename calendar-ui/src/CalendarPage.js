@@ -5,8 +5,15 @@ import interactionPlugin from "@fullcalendar/interaction";
 import fiLocale from "@fullcalendar/core/locales/fi";
 import "./App.css";
 
+import { useEffect, useState } from "react";
+import FullCalendar from "@fullcalendar/react";
+import dayGridPlugin from "@fullcalendar/daygrid";
+import interactionPlugin from "@fullcalendar/interaction";
+import fiLocale from "@fullcalendar/core/locales/fi";
+import "./App.css";
+
 // 🌐 API URL (Vercel + Render)
-const API = process.env.REACT_APP_API_URL;
+const API = process.env.REACT_APP_API_URL || "https://kaivinkonekalenteri.onrender.com";
 
 function App() {
   const [events, setEvents] = useState([]);
@@ -20,9 +27,7 @@ function App() {
   const [deleteTarget, setDeleteTarget] = useState(null);
   const [deleteInput, setDeleteInput] = useState("");
 
-
-
-  // DEVICE ID
+  // DEVICE ID (SAFE VERSION)
   const [deviceId] = useState(() => {
     const saved = localStorage.getItem("deviceId");
 
