@@ -17,6 +17,7 @@ function App() {
         <Route path="/" element={<Navigate to="/kalenteri" />} />
 
         {/* sivut */}
+        <Route path="/home" element={<Home />} />
         <Route path="/kalenteri" element={<CalendarPage />} />
         <Route path="/contact" element={<Contact />} />
         <Route path="/admin" element={<AdminPage />} />
