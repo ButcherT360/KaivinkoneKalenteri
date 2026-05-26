@@ -104,9 +104,8 @@
 
 .container {
   display: flex;
-  justify-content: center; /* vaakasuora */
-  align-items: center;     /* pystysuora */
-  height: 100vh;           /* koko ruutu */
+  justify-content: center;
+  align-items: center;
 }
 
 .navbar {
