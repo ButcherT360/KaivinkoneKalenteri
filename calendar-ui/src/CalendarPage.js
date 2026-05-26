@@ -172,8 +172,10 @@ function App() {
             src="/logo.png"
             alt="Logo"
             style={{
-              width: "720px",
-              height: "1080px",
+              width: "100%",
+              maxWidth: "720px",
+              height: "100%",
+              maxHeight: "1080px",
               borderRadius: "10px"
             }}
           />
