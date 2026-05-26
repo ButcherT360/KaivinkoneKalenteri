@@ -8,9 +8,6 @@
 }
 
 @media (max-width: 768px) {
-  .App-logo {
-    animation: none;
-  }
 
   .navbar {
     flex-direction: column;
@@ -22,22 +19,6 @@
     gap: 10px;
   }
 
-  .container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    /* <- TÄMÄ keskittää vaakasuunnassa */
-    justify-content: center;
-    padding: 10px;
-  }
-
-  .container img {
-    max-width: 100%;
-    height: auto;
-    display: block;
-    margin: 0 auto;
-  }
-
   .layout {
     flex-direction: column;
   }
@@ -47,11 +28,13 @@
     width: 100%;
   }
 
-  .left img {
-    width: 100%;
-    max-width: 720px;
-    height: auto;
-    border-radius: 10px;
+  .container {
+    flex-direction: column;
+    padding: 10px;
+  }
+
+  .container img {
+    max-width: 100%;
   }
 }
 
@@ -154,21 +137,30 @@
   border-radius: 6px;
 }
 
+/* =========================
+   CONTAINER (KORJATTU)
+========================= */
+
 .container {
+  display: flex;
   justify-content: center;
   align-items: center;
-  height: auto;
-  /* EI 100vh */
   padding: 20px;
 }
 
-/* Kuva responsiiviseksi */
+/* Kuva keskelle ja siistiksi */
 .container img {
   width: 100%;
   max-width: 720px;
   height: auto;
   border-radius: 10px;
+  display: block;
+  margin: 0 auto;
 }
+
+/* =========================
+   LAYOUT (kalenteri + kuva)
+========================= */
 
 .layout {
   display: flex;
@@ -176,12 +168,12 @@
   align-items: flex-start;
 }
 
-/* Vasen kuva */
+/* Vasen (kuva) */
 .left {
+  flex: 1;
+  display: flex;
   justify-content: center;
   align-items: center;
-  height: auto;
-  /* EI 100vh */
   padding: 20px;
 }
 
@@ -190,9 +182,9 @@
   max-width: 720px;
   height: auto;
   border-radius: 10px;
-
 }
 
+/* Oikea (kalenteri) */
 .right {
   flex: 1;
 }
