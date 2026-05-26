@@ -37,16 +37,13 @@
 }
 
 .fc {
-  color: white;
-}
-/* vapaat päivät */
-.fc-daygrid-day {
-  background-color: #e8ffe8;
+  background: #111;
+  color: #fff;
 }
 
-.fc .fc-toolbar-title,
-.fc .fc-daygrid-day-number {
-  color: white;
+.fc-theme-standard td,
+.fc-theme-standard th {
+  border-color: #333;
 }
 
 /* varatut eventit (FullCalendar hoitaa värin nyt) */
