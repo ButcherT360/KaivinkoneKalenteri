@@ -1,7 +1,7 @@
 export default function Contact() {
     return (
         <div style={{ padding: 20 }}>
-            <h1>Yhteystiedot</h1>
+            <h1 className="title-bar">Yhteystiedot</h1>
 
             <div>
                 <img

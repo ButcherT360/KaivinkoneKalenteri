@@ -156,7 +156,7 @@ function App() {
   return (
     <div style={{ padding: 20 }}>
 
-      <h1>Kaivurin vuokrauskalenteri</h1>
+      <h1 className="title-bar">Kaivurin vuokrauskalenteri</h1>
 
       <div
         style={{

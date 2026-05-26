@@ -9,7 +9,7 @@ export default function Machines() {
 
   return (
     <div style={{ padding: 20 }}>
-      <h1>Vuokrattava kone ja kauhat</h1>
+      <h1 className="title-bar">Vuokrattava kone ja kauhat</h1>
 
       <div className="gallery">
         {images.map((img, i) => (

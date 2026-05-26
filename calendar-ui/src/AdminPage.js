@@ -99,7 +99,7 @@ function AdminPage() {
   return (
     <div style={{ padding: 20 }}>
 
-      <h1>Admin - Varaukset</h1>
+      <h1 className="title-bar">Admin - Varaukset</h1>
 
       <button
         onClick={() => {
