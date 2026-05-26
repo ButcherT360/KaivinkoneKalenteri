@@ -1,7 +1,6 @@
-React paskat
+React
 
 - express
-- sqlite3
 - cors
 - dotenv
 - jsonwebtoken
@@ -9,3 +8,5 @@ React paskat
 - @fullcalendar/react
 - @fullcalendar/daygrid
 - @fullcalendar/interaction
+
+Supabase tietokanta
