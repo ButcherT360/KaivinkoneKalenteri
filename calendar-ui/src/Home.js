@@ -1,8 +1,10 @@
 export default function Home() {
     return (
-        <div className="container">
+        <div>
             <h1 className="title-bar">Etusivu</h1>
-            <img src="/logo.png" alt="kaivurilogo" />
+            <div className="container">
+                <img src="/logo.png" alt="kaivurilogo" />
+            </div>
         </div>
     );
 }

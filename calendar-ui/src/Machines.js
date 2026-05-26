@@ -8,13 +8,15 @@ export default function Machines() {
     ];
 
     return (
+        <div><h1 className="title-bar">Vuokrattava kone ja kauhat</h1>
             <div className="container">
-                <h1 className="title-bar">Vuokrattava kone ja kauhat</h1>
+
                 <div className="gallery">
                     {images.map((img, i) => (
                         <img key={i} src={img} alt="" />
                     ))}
                 </div>
             </div>
+        </div>
     );
 }
