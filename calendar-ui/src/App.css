@@ -19,6 +19,14 @@
     flex-direction: column;
     gap: 10px;
   }
+  .container {
+    flex-direction: column;
+    padding: 10px;
+  }
+
+  .container img {
+    max-width: 100%;
+  }
 }
 
 .App-header {
@@ -121,6 +129,16 @@
   display: flex;
   justify-content: center;
   align-items: center;
+  height: auto; /* EI 100vh */
+  padding: 20px;
+}
+
+/* Kuva responsiiviseksi */
+.container img {
+  width: 100%;
+  max-width: 720px;
+  height: auto;
+  border-radius: 10px;
 }
 
 .navbar {
