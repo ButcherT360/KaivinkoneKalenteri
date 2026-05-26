@@ -164,7 +164,7 @@ function App() {
       <div className="layout"
       >
         {/* VASEN */}
-        <div className="left">
+        <div className="container">
           <img src="/logo.png" alt="kaivurilogo"></img>
         </div>
 
