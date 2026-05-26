@@ -14,7 +14,7 @@ function App() {
 
       <Routes>
         {/* redirect root → home */}
-        <Route path="/" element={<Navigate to="/home" />} />
+        <Route path="/" element={<Navigate to="/koti" />} />
 
         {/* sivut */}
         <Route path="/koti" element={<Home />} />
