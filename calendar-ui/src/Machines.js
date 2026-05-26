@@ -8,7 +8,7 @@ export default function Machines() {
     ];
 
     return (
-            <div style={{ padding: 20 }}>
+            <div className="layout">
                 <h1 className="title-bar">Vuokrattava kone ja kauhat</h1>
 
                 <div className="gallery">

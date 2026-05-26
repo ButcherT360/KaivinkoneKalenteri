@@ -27,7 +27,25 @@
   .container img {
     max-width: 100%;
   }
+  .layout {
+    flex-direction: column;
+  }
+
+  .left {
+    flex: none;
+    width: 100%;
+  }
+
+  .right {
+    width: 100%;
+  }
+
+  .left img {
+    width: 100%;
+    height: auto;
+  }
 }
+
 
 .App-header {
   background-color: #282c34;
@@ -139,6 +157,22 @@
   max-width: 720px;
   height: auto;
   border-radius: 10px;
+}
+
+.layout {
+  display: flex;
+  gap: 30px;
+  align-items: flex-start;
+}
+
+/* Vasen kuva */
+.left {
+  flex: 0 0 720px;
+}
+
+/* Oikea kalenteri */
+.right {
+  flex: 1;
 }
 
 .navbar {

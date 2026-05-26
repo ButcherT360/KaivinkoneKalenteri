@@ -98,7 +98,7 @@ function AdminPage() {
   // ======================
   return (
     
-    <div style={{ padding: 20 }}>
+    <div className="layout">
 
       <h1 className="title-bar">Admin - Varaukset</h1>
 

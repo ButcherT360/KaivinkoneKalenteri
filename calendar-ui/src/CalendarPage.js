@@ -161,20 +161,15 @@ function App() {
     <div style={{ padding: 20 }}>
       <h1 className="title-bar">Kaivurin vuokrauskalenteri</h1>
 
-      <div
-        style={{
-          display: "flex",
-          gap: "30px",
-          alignItems: "flex-start",
-        }}
+      <div className="layout"
       >
         {/* VASEN */}
-        <div className="container">
+        <div className="left">
           <img src="/logo.png" alt="kaivurilogo"></img>
         </div>
 
         {/* OIKEA */}
-        <div style={{ flex: 1 }}>
+        <div className="right">
           {loading && <p>Ladataan varauksia...</p>}
 
           <FullCalendar

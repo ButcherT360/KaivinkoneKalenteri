@@ -53,7 +53,7 @@ export default function AdminLogin({ onLogin }) {
   };
 
   return (
-    <div style={{ padding: 20 }}>
+    <div className="layout">
 
       <h2>Admin login</h2>
 

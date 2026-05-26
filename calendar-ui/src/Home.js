@@ -1,6 +1,6 @@
 export default function Home() {
     return (
-            <div style={{ padding: 20 }}>
+            <div className="layout">
                 <h1 className="title-bar">Etusivu</h1>
 
                 <div className="container">
