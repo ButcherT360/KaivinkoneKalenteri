@@ -3,7 +3,7 @@ export default function Contact() {
         <div style={{ padding: 20 }}>
             <h1 className="title-bar">Yhteystiedot</h1>
             <div className="container">
-                <img src="/logo.png" />
+                <img src="/logo.png" alt="kaivurilogo" />
             </div>
         </div>
 
