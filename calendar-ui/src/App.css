@@ -11,14 +11,17 @@
   .App-logo {
     animation: none;
   }
+
   .navbar {
     flex-direction: column;
     align-items: flex-start;
   }
-    .links {
+
+  .links {
     flex-direction: column;
     gap: 10px;
   }
+
   .container {
     flex-direction: column;
     padding: 10px;
@@ -27,22 +30,20 @@
   .container img {
     max-width: 100%;
   }
+
   .layout {
     flex-direction: column;
   }
-
-  .left {
-    flex: none;
-    width: 100%;
-  }
-
+  .left,
   .right {
     width: 100%;
   }
 
   .left img {
     width: 100%;
+    max-width: 720px;
     height: auto;
+    border-radius: 10px;
   }
 }
 
@@ -90,7 +91,7 @@
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(0,0,0,0.5);
+  background: rgba(0, 0, 0, 0.5);
 
   display: flex;
   justify-content: center;
@@ -125,9 +126,11 @@
   background-color: #d4f8d4;
   cursor: pointer;
 }
+
 .booked {
   background-color: hsl(0, 0%, 100%) !important;
 }
+
 .booked:hover {
   background-color: #ffd6d6 !important;
   cursor: not-allowed;
@@ -146,7 +149,8 @@
 .container {
   justify-content: center;
   align-items: center;
-  height: auto; /* EI 100vh */
+  height: auto;
+  /* EI 100vh */
   padding: 20px;
 }
 
@@ -159,6 +163,7 @@
 }
 
 .layout {
+  display: flex;
   gap: 30px;
   align-items: flex-start;
 }
@@ -166,13 +171,10 @@
 /* Vasen kuva */
 .left {
   flex: 1;
-  width: 100%;
-  max-width: 720px;
-  height: auto;
-  border-radius: 10px;
+  display: flex;
+  justify-content: center;
 }
 
-/* Oikea kalenteri */
 .right {
   flex: 1;
 }
@@ -227,6 +229,7 @@ body {
   from {
     transform: rotate(0deg);
   }
+
   to {
     transform: rotate(360deg);
   }
