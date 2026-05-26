@@ -167,7 +167,7 @@
 
 /* Vasen kuva */
 .left {
-  flex: 0 0 720px;
+  flex: 1;
 }
 
 /* Oikea kalenteri */
