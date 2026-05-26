@@ -4,7 +4,7 @@ export default function Home() {
             <h1 className="title-bar">Etusivu</h1>
 
             <div className="container">
-                <img src="/logo.png" />
+                <img src="/logo.png" alt="kaivurilogo"/>
             </div>
         </div>
     );
