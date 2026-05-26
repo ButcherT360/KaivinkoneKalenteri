@@ -7,9 +7,9 @@ export default function Navbar() {
 
       <div className="links">
         <Link to="/">Etusivu</Link>
-        <Link to="/machines">Koneet</Link>
-        <Link to="/calendar">Kalenteri</Link>
-        <Link to="/contact">Yhteystiedot</Link>
+        <Link to="/kalenteri">Kalenteri</Link>
+        <Link to="/koneet">Koneet</Link>
+        <Link to="/yhteystiedot">Yhteystiedot</Link>
       </div>
     </nav>
   );
