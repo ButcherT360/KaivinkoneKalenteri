@@ -154,117 +154,119 @@ function App() {
   }
 
   return (
-    <div style={{ padding: 20 }}>
+    <body>
+      <div style={{ padding: 20 }}>
 
-      <h1 className="title-bar">Kaivurin vuokrauskalenteri</h1>
+        <h1 className="title-bar">Kaivurin vuokrauskalenteri</h1>
 
-      <div
-        style={{
-          display: "flex",
-          gap: "30px",
-          alignItems: "flex-start"
-        }}
-      >
+        <div
+          style={{
+            display: "flex",
+            gap: "30px",
+            alignItems: "flex-start"
+          }}
+        >
 
-        {/* VASEN */}
-        <div>
-          <img
-            src="/logo.png"
-            alt="Logo"
-            style={{
-              width: "100%",
-              maxWidth: "720px",
-              height: "100%",
-              maxHeight: "1080px",
-              borderRadius: "10px"
-            }}
-          />
-        </div>
+          {/* VASEN */}
+          <div>
+            <img
+              src="/logo.png"
+              alt="Logo"
+              style={{
+                width: "100%",
+                maxWidth: "720px",
+                height: "100%",
+                maxHeight: "1080px",
+                borderRadius: "10px"
+              }}
+            />
+          </div>
 
-        {/* OIKEA */}
-        <div style={{ flex: 1 }}>
+          {/* OIKEA */}
+          <div style={{ flex: 1 }}>
 
-          {loading && <p>Ladataan varauksia...</p>}
+            {loading && <p>Ladataan varauksia...</p>}
 
-          <FullCalendar
-            plugins={[dayGridPlugin, interactionPlugin]}
-            initialView="dayGridMonth"
-            locale={fiLocale}
-            events={events}
-            dateClick={handleDateClick}
-            eventClick={(info) => setDeleteTarget(info.event)}
-          />
+            <FullCalendar
+              plugins={[dayGridPlugin, interactionPlugin]}
+              initialView="dayGridMonth"
+              locale={fiLocale}
+              events={events}
+              dateClick={handleDateClick}
+              eventClick={(info) => setDeleteTarget(info.event)}
+            />
 
-          {/* VARAUSLISTA */}
-          <h2>Varaukset</h2>
+            {/* VARAUSLISTA */}
+            <h2>Varaukset</h2>
 
-          {events.length === 0 ? (
-            <p>Ei varauksia</p>
-          ) : (
-            events.map((event) => (
-              <div key={event.id} className="bookingItem">
-                <strong>{event.start}</strong> – {event.title}
+            {events.length === 0 ? (
+              <p>Ei varauksia</p>
+            ) : (
+              events.map((event) => (
+                <div key={event.id} className="bookingItem">
+                  <strong>{event.start}</strong> – {event.title}
 
-                <button onClick={() => setDeleteTarget(event)}>
-                  Poista
-                </button>
+                  <button onClick={() => setDeleteTarget(event)}>
+                    Poista
+                  </button>
+                </div>
+              ))
+            )}
+
+            {/* CREATE MODAL */}
+            {showModal && (
+              <div className="modalOverlay">
+                <div className="modal">
+                  <h2>Uusi varaus</h2>
+
+                  <p>Päivä: {selectedDate}</p>
+
+                  <input
+                    placeholder="Nimi"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                  />
+
+                  <input
+                    type="password"
+                    placeholder="Poistokoodi"
+                    value={deleteCode}
+                    onChange={(e) => setDeleteCode(e.target.value)}
+                  />
+
+                  <button onClick={saveBooking}>Tallenna</button>
+                  <button onClick={() => setShowModal(false)}>Peruuta</button>
+                </div>
               </div>
-            ))
-          )}
+            )}
 
-          {/* CREATE MODAL */}
-          {showModal && (
-            <div className="modalOverlay">
-              <div className="modal">
-                <h2>Uusi varaus</h2>
+            {/* DELETE MODAL */}
+            {deleteTarget && (
+              <div className="modalOverlay">
+                <div className="modal">
+                  <h2>Poista varaus</h2>
 
-                <p>Päivä: {selectedDate}</p>
+                  <p>{deleteTarget.title}</p>
 
-                <input
-                  placeholder="Nimi"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                />
+                  <input
+                    type="password"
+                    placeholder="Poistokoodi"
+                    value={deleteInput}
+                    onChange={(e) => setDeleteInput(e.target.value)}
+                  />
 
-                <input
-                  type="password"
-                  placeholder="Poistokoodi"
-                  value={deleteCode}
-                  onChange={(e) => setDeleteCode(e.target.value)}
-                />
-
-                <button onClick={saveBooking}>Tallenna</button>
-                <button onClick={() => setShowModal(false)}>Peruuta</button>
+                  <button onClick={confirmDelete}>Poista</button>
+                  <button onClick={() => setDeleteTarget(null)}>
+                    Peruuta
+                  </button>
+                </div>
               </div>
-            </div>
-          )}
+            )}
 
-          {/* DELETE MODAL */}
-          {deleteTarget && (
-            <div className="modalOverlay">
-              <div className="modal">
-                <h2>Poista varaus</h2>
-
-                <p>{deleteTarget.title}</p>
-
-                <input
-                  type="password"
-                  placeholder="Poistokoodi"
-                  value={deleteInput}
-                  onChange={(e) => setDeleteInput(e.target.value)}
-                />
-
-                <button onClick={confirmDelete}>Poista</button>
-                <button onClick={() => setDeleteTarget(null)}>
-                  Peruuta
-                </button>
-              </div>
-            </div>
-          )}
-
+          </div>
         </div>
       </div>
-    </div>
+    </body>
   );
 }
 

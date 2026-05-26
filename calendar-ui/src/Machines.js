@@ -1,21 +1,23 @@
 export default function Machines() {
-  const images = [
-    "logo.png",
-    "/Kauha_1.jpeg",
-    "/Kauha_2.jpeg",
-    "/Kauha_3.jpeg",
-    "/Kauhat_1_2.jpeg"
-  ];
+    const images = [
+        "logo.png",
+        "/Kauha_1.jpeg",
+        "/Kauha_2.jpeg",
+        "/Kauha_3.jpeg",
+        "/Kauhat_1_2.jpeg"
+    ];
 
-  return (
-    <div style={{ padding: 20 }}>
-      <h1 className="title-bar">Vuokrattava kone ja kauhat</h1>
+    return (
+        <body>
+            <div style={{ padding: 20 }}>
+                <h1 className="title-bar">Vuokrattava kone ja kauhat</h1>
 
-      <div className="gallery">
-        {images.map((img, i) => (
-          <img key={i} src={img} alt="" />
-        ))}
-      </div>
-    </div>
-  );
+                <div className="gallery">
+                    {images.map((img, i) => (
+                        <img key={i} src={img} alt="" />
+                    ))}
+                </div>
+            </div>
+        </body>
+    );
 }
