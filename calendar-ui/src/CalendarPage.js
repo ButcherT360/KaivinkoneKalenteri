@@ -5,13 +5,6 @@ import interactionPlugin from "@fullcalendar/interaction";
 import fiLocale from "@fullcalendar/core/locales/fi";
 import "./App.css";
 
-import { useEffect, useState } from "react";
-import FullCalendar from "@fullcalendar/react";
-import dayGridPlugin from "@fullcalendar/daygrid";
-import interactionPlugin from "@fullcalendar/interaction";
-import fiLocale from "@fullcalendar/core/locales/fi";
-import "./App.css";
-
 // 🌐 API URL (Vercel + Render)
 const API = process.env.REACT_APP_API_URL || "https://kaivinkonekalenteri.onrender.com";
 
