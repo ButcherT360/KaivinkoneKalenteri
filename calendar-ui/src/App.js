@@ -13,12 +13,12 @@ function App() {
       <Navbar />
 
       <Routes>
-        {/* redirect root → kalenteri */}
-        <Route path="/" element={<Navigate to="/kalenteri" />} />
+        {/* redirect root → home */}
+        <Route path="/" element={<Navigate to="/home" />} />
 
         {/* sivut */}
         <Route path="/home" element={<Home />} />
-        <Route path="/kalenteri" element={<CalendarPage />} />
+        <Route path="/calendarpage" element={<CalendarPage />} />
         <Route path="/contact" element={<Contact />} />
         <Route path="/admin" element={<AdminPage />} />
         <Route path="/machines" element={<Machines />} />
