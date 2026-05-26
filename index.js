@@ -1,11 +1,21 @@
 require("dotenv").config();
 const jwt = require("jsonwebtoken");
 const express = require("express");
-const Database = require("better-sqlite3");
 const cors = require("cors");
 const path = require("path");
+const { Pool } = require("pg");
 
 const app = express();
+
+// =======================
+//  POSTGRES
+// =======================
+const pool = new Pool({
+  connectionString: process.env.DATABASE_URL,
+  ssl: {
+    rejectUnauthorized: false
+  }
+});
 
 // =======================
 //  MIDDLEWARE
@@ -17,22 +27,6 @@ app.use(express.json());
 //  STATIC
 // =======================
 app.use(express.static(path.join(__dirname, "build")));
-
-// =======================
-//  DB
-// =======================
-const db = new Database("bookings.db");
-
-db.prepare(`
-  CREATE TABLE IF NOT EXISTS bookings (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    date TEXT NOT NULL,
-    name TEXT NOT NULL,
-    deleteCode TEXT NOT NULL,
-    ip TEXT,
-    deviceId TEXT
-  )
-`).run();
 
 // =======================
 //  HELPERS
@@ -55,7 +49,9 @@ function isRateLimited(ip) {
   const user = rateMap.get(ip) || [];
   const recent = user.filter(t => now - t < windowMs);
 
-  if (recent.length >= limit) return true;
+  if (recent.length >= limit) {
+    return true;
+  }
 
   recent.push(now);
   rateMap.set(ip, recent);
@@ -85,112 +81,161 @@ app.post("/admin/login", (req, res) => {
 // =======================
 //  GET BOOKINGS
 // =======================
-app.get("/bookings", (req, res) => {
-  const rows = db.prepare("SELECT * FROM bookings").all();
-  res.json(rows);
+app.get("/bookings", async (req, res) => {
+  try {
+    const result = await pool.query(
+      "SELECT * FROM bookings ORDER BY id DESC"
+    );
+
+    res.json(result.rows);
+
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({ error: "Database error" });
+  }
 });
 
 // =======================
-//  CREATE BOOKING (FINAL CLEAN)
+//  CREATE BOOKING
 // =======================
-app.post("/bookings", (req, res) => {
-  const { date, name, deleteCode, deviceId } = req.body;
+app.post("/bookings", async (req, res) => {
+  try {
+    const { date, name, deleteCode, deviceId } = req.body;
 
-  if (!date || !name || !deleteCode || !deviceId) {
-    return res.status(400).json({ error: "Missing data" });
-  }
-
-  const ip = getIP(req);
-
-  // rate limit
-  if (isRateLimited(ip)) {
-    return res.status(429).json({
-      error: "Liikaa varauksia lyhyessä ajassa"
-    });
-  }
-
-  // device check
-  const deviceExists = db.prepare(
-    "SELECT * FROM bookings WHERE deviceId = ? AND date = ?"
-  ).get(deviceId, date);
-
-  if (deviceExists) {
-    return res.status(400).json({
-      error: "Olet jo varannut tämän päivän"
-    });
-  }
-
-  // ip check
-  const ipExists = db.prepare(
-    "SELECT * FROM bookings WHERE ip = ? AND date = ?"
-  ).get(ip, date);
-
-  if (ipExists) {
-    return res.status(400).json({
-      error: "Olet jo varannut tämän päivän"
-    });
-  }
-
-  // day check
-  const exists = db.prepare(
-    "SELECT * FROM bookings WHERE date = ?"
-  ).get(date);
-
-  if (exists) {
-    return res.status(400).json({
-      error: "Päivä on jo varattu"
-    });
-  }
-
-  const stmt = db.prepare(`
-    INSERT INTO bookings (date, name, deleteCode, ip, deviceId)
-    VALUES (?, ?, ?, ?, ?)
-  `);
-
-  const result = stmt.run(date, name, deleteCode, ip, deviceId);
-
-  res.json({
-    id: result.lastInsertRowid,
-    date,
-    name
-  });
-});
-
-// =======================
-//  DELETE
-// =======================
-app.delete("/bookings/:id", (req, res) => {
-  const code = req.body?.code;
-  const auth = req.headers.authorization;
-
-  const isAdmin = auth && auth.startsWith("Bearer ");
-
-  const row = db.prepare(
-    "SELECT * FROM bookings WHERE id = ?"
-  ).get(req.params.id);
-
-  if (!row) {
-    return res.status(404).json({ error: "Not found" });
-  }
-
-  if (!isAdmin) {
-    if (!code) return res.status(400).json({ error: "Missing code" });
-
-    if (row.deleteCode !== code) {
-      return res.status(403).json({ error: "Wrong code" });
+    if (!date || !name || !deleteCode || !deviceId) {
+      return res.status(400).json({
+        error: "Missing data"
+      });
     }
+
+    const ip = getIP(req);
+
+    // RATE LIMIT
+    if (isRateLimited(ip)) {
+      return res.status(429).json({
+        error: "Liikaa varauksia lyhyessä ajassa"
+      });
+    }
+
+    // DEVICE CHECK
+    const deviceExists = await pool.query(
+      "SELECT * FROM bookings WHERE deviceId = $1 AND date = $2",
+      [deviceId, date]
+    );
+
+    if (deviceExists.rows.length > 0) {
+      return res.status(400).json({
+        error: "Olet jo varannut tämän päivän"
+      });
+    }
+
+    // IP CHECK
+    const ipExists = await pool.query(
+      "SELECT * FROM bookings WHERE ip = $1 AND date = $2",
+      [ip, date]
+    );
+
+    if (ipExists.rows.length > 0) {
+      return res.status(400).json({
+        error: "Olet jo varannut tämän päivän"
+      });
+    }
+
+    // DAY CHECK
+    const exists = await pool.query(
+      "SELECT * FROM bookings WHERE date = $1",
+      [date]
+    );
+
+    if (exists.rows.length > 0) {
+      return res.status(400).json({
+        error: "Päivä on jo varattu"
+      });
+    }
+
+    // INSERT
+    const result = await pool.query(
+      `
+      INSERT INTO bookings
+      (date, name, deleteCode, ip, deviceId)
+      VALUES ($1, $2, $3, $4, $5)
+      RETURNING *
+      `,
+      [date, name, deleteCode, ip, deviceId]
+    );
+
+    res.json(result.rows[0]);
+
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({ error: "Server error" });
   }
+});
 
-  db.prepare("DELETE FROM bookings WHERE id = ?").run(req.params.id);
+// =======================
+//  DELETE BOOKING
+// =======================
+app.delete("/bookings/:id", async (req, res) => {
+  try {
+    const code = req.body?.code;
+    const auth = req.headers.authorization;
 
-  res.json({ success: true, deletedId: req.params.id });
+    const isAdmin =
+      auth && auth.startsWith("Bearer ");
+
+    const result = await pool.query(
+      "SELECT * FROM bookings WHERE id = $1",
+      [req.params.id]
+    );
+
+    const row = result.rows[0];
+
+    if (!row) {
+      return res.status(404).json({
+        error: "Not found"
+      });
+    }
+
+    // USER CHECK
+    if (!isAdmin) {
+      if (!code) {
+        return res.status(400).json({
+          error: "Missing code"
+        });
+      }
+
+      if (row.deletecode !== code) {
+        return res.status(403).json({
+          error: "Wrong code"
+        });
+      }
+    }
+
+    await pool.query(
+      "DELETE FROM bookings WHERE id = $1",
+      [req.params.id]
+    );
+
+    res.json({
+      success: true,
+      deletedId: req.params.id
+    });
+
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({
+      error: "Server error"
+    });
+  }
 });
 
 // =======================
 //  404
 // =======================
 app.use((req, res) => {
-  res.status(404).json({ error: "Not found" });
+  res.status(404).json({
+    error: "Not found"
+  });
 });
 
 // =======================
