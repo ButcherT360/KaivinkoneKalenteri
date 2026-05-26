@@ -118,6 +118,11 @@
   color: white;
 }
 
+body {
+  margin: 0;
+  padding-top: 70px;
+}
+
 .links {
   display: flex;
   gap: 15px;
