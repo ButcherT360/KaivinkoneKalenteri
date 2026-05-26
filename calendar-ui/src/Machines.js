@@ -8,7 +8,6 @@ export default function Machines() {
     ];
 
     return (
-        <body>
             <div style={{ padding: 20 }}>
                 <h1 className="title-bar">Vuokrattava kone ja kauhat</h1>
 
@@ -18,6 +17,5 @@ export default function Machines() {
                     ))}
                 </div>
             </div>
-        </body>
     );
 }

@@ -1,12 +1,14 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import interactionPlugin from "@fullcalendar/interaction";
 import fiLocale from "@fullcalendar/core/locales/fi";
 import "./App.css";
 
-// 🌐 API URL (Vercel + Render)
-const API = process.env.REACT_APP_API_URL || "https://kaivinkonekalenteri.onrender.com";
+//  API URL (Vercel + Render)
+const API =
+  process.env.REACT_APP_API_URL ||
+  "https://kaivinkonekalenteri.onrender.com";
 
 function App() {
   const [events, setEvents] = useState([]);
@@ -20,19 +22,21 @@ function App() {
   const [deleteTarget, setDeleteTarget] = useState(null);
   const [deleteInput, setDeleteInput] = useState("");
 
-  // DEVICE ID (SAFE VERSION)
+  //  OPTIMOITU LOOKUP (ei lagia)
+  const bookedSet = useMemo(() => {
+    return new Set(events.map((e) => String(e.start)));
+  }, [events]);
+
+  //  DEVICE ID (ei localStorage kirjoitusta renderissä)
   const [deviceId] = useState(() => {
     const saved = localStorage.getItem("deviceId");
-
     if (saved) return saved;
 
     const id = crypto.randomUUID();
     localStorage.setItem("deviceId", id);
-
     return id;
   });
 
-  localStorage.setItem("deviceId", deviceId);
   // ======================
   //  HAE VARAUKSET
   // ======================
@@ -51,7 +55,7 @@ function App() {
           backgroundColor: "#a855f7",
           borderColor: "#a855f7",
           textColor: "#ffffff",
-          allDay: true
+          allDay: true,
         }))
       );
     } catch (err) {
@@ -71,7 +75,7 @@ function App() {
   function handleDateClick(info) {
     const date = info.dateStr;
 
-    const isBooked = events.some((e) => e.start === date);
+    const isBooked = bookedSet.has(date);
 
     if (isBooked) {
       alert("Tämä päivä on jo varattu!");
@@ -99,8 +103,8 @@ function App() {
           date: selectedDate,
           name,
           deleteCode,
-          deviceId
-        })
+          deviceId,
+        }),
       });
 
       const data = await res.json();
@@ -133,7 +137,7 @@ function App() {
         {
           method: "DELETE",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ code: deleteInput })
+          body: JSON.stringify({ code: deleteInput }),
         }
       );
 
@@ -154,119 +158,113 @@ function App() {
   }
 
   return (
-    <body>
-      <div style={{ padding: 20 }}>
+    <div style={{ padding: 20 }}>
+      <h1 className="title-bar">Kaivurin vuokrauskalenteri</h1>
 
-        <h1 className="title-bar">Kaivurin vuokrauskalenteri</h1>
+      <div
+        style={{
+          display: "flex",
+          gap: "30px",
+          alignItems: "flex-start",
+        }}
+      >
+        {/* VASEN */}
+        <div>
+          <img
+            src="/logo.png"
+            alt="Logo"
+            style={{
+              width: "100%",
+              maxWidth: "720px",
+              borderRadius: "10px",
+            }}
+          />
+        </div>
 
-        <div
-          style={{
-            display: "flex",
-            gap: "30px",
-            alignItems: "flex-start"
-          }}
-        >
+        {/* OIKEA */}
+        <div style={{ flex: 1 }}>
+          {loading && <p>Ladataan varauksia...</p>}
 
-          {/* VASEN */}
-          <div>
-            <img
-              src="/logo.png"
-              alt="Logo"
-              style={{
-                width: "100%",
-                maxWidth: "720px",
-                height: "100%",
-                maxHeight: "1080px",
-                borderRadius: "10px"
-              }}
-            />
-          </div>
+          <FullCalendar
+            plugins={[dayGridPlugin, interactionPlugin]}
+            initialView="dayGridMonth"
+            locale={fiLocale}
+            events={events}
+            dateClick={handleDateClick}
+            eventClick={(info) => setDeleteTarget(info.event)}
+          />
 
-          {/* OIKEA */}
-          <div style={{ flex: 1 }}>
+          {/* VARAUSLISTA */}
+          <h2>Varaukset</h2>
 
-            {loading && <p>Ladataan varauksia...</p>}
+          {events.length === 0 ? (
+            <p>Ei varauksia</p>
+          ) : (
+            events.map((event) => (
+              <div key={event.id} className="bookingItem">
+                <strong>{event.start}</strong> – {event.title}
 
-            <FullCalendar
-              plugins={[dayGridPlugin, interactionPlugin]}
-              initialView="dayGridMonth"
-              locale={fiLocale}
-              events={events}
-              dateClick={handleDateClick}
-              eventClick={(info) => setDeleteTarget(info.event)}
-            />
-
-            {/* VARAUSLISTA */}
-            <h2>Varaukset</h2>
-
-            {events.length === 0 ? (
-              <p>Ei varauksia</p>
-            ) : (
-              events.map((event) => (
-                <div key={event.id} className="bookingItem">
-                  <strong>{event.start}</strong> – {event.title}
-
-                  <button onClick={() => setDeleteTarget(event)}>
-                    Poista
-                  </button>
-                </div>
-              ))
-            )}
-
-            {/* CREATE MODAL */}
-            {showModal && (
-              <div className="modalOverlay">
-                <div className="modal">
-                  <h2>Uusi varaus</h2>
-
-                  <p>Päivä: {selectedDate}</p>
-
-                  <input
-                    placeholder="Nimi"
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                  />
-
-                  <input
-                    type="password"
-                    placeholder="Poistokoodi"
-                    value={deleteCode}
-                    onChange={(e) => setDeleteCode(e.target.value)}
-                  />
-
-                  <button onClick={saveBooking}>Tallenna</button>
-                  <button onClick={() => setShowModal(false)}>Peruuta</button>
-                </div>
+                <button onClick={() => setDeleteTarget(event)}>
+                  Poista
+                </button>
               </div>
-            )}
+            ))
+          )}
 
-            {/* DELETE MODAL */}
-            {deleteTarget && (
-              <div className="modalOverlay">
-                <div className="modal">
-                  <h2>Poista varaus</h2>
+          {/* CREATE MODAL */}
+          {showModal && (
+            <div className="modalOverlay">
+              <div className="modal">
+                <h2>Uusi varaus</h2>
 
-                  <p>{deleteTarget.title}</p>
+                <p>Päivä: {selectedDate}</p>
 
-                  <input
-                    type="password"
-                    placeholder="Poistokoodi"
-                    value={deleteInput}
-                    onChange={(e) => setDeleteInput(e.target.value)}
-                  />
+                <input
+                  placeholder="Nimi"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                />
 
-                  <button onClick={confirmDelete}>Poista</button>
-                  <button onClick={() => setDeleteTarget(null)}>
-                    Peruuta
-                  </button>
-                </div>
+                <input
+                  type="password"
+                  placeholder="Poistokoodi"
+                  value={deleteCode}
+                  onChange={(e) => setDeleteCode(e.target.value)}
+                />
+
+                <button onClick={saveBooking}>Tallenna</button>
+                <button onClick={() => setShowModal(false)}>
+                  Peruuta
+                </button>
               </div>
-            )}
+            </div>
+          )}
 
-          </div>
+          {/* DELETE MODAL */}
+          {deleteTarget && (
+            <div className="modalOverlay">
+              <div className="modal">
+                <h2>Poista varaus</h2>
+
+                <p>{deleteTarget.title}</p>
+
+                <input
+                  type="password"
+                  placeholder="Poistokoodi"
+                  value={deleteInput}
+                  onChange={(e) => setDeleteInput(e.target.value)}
+                />
+
+                <button onClick={confirmDelete}>Poista</button>
+                <button onClick={() => setDeleteTarget(null)}>
+                  Peruuta
+                </button>
+              </div>
+            </div>
+          )}
         </div>
       </div>
-    </body>
+    </div>
   );
 }
 

@@ -2,7 +2,6 @@ import { Link } from "react-router-dom";
 
 export default function Navbar() {
   return (
-    <body>
       <nav className="navbar">
         <h2>Kaivinkone vuokraus</h2>
 
@@ -13,6 +12,5 @@ export default function Navbar() {
           <Link to="/yhteystiedot">Yhteystiedot</Link>
         </div>
       </nav>
-    </body>
   );
 }
