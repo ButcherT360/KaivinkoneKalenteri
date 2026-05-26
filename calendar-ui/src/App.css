@@ -144,7 +144,6 @@
 }
 
 .container {
-  display: flex;
   justify-content: center;
   align-items: center;
   height: auto; /* EI 100vh */
@@ -160,7 +159,6 @@
 }
 
 .layout {
-  display: flex;
   gap: 30px;
   align-items: flex-start;
 }
@@ -168,6 +166,10 @@
 /* Vasen kuva */
 .left {
   flex: 1;
+  width: 100%;
+  max-width: 720px;
+  height: auto;
+  border-radius: 10px;
 }
 
 /* Oikea kalenteri */
