@@ -6,7 +6,7 @@ export default function Navbar() {
       <h2>Kaivinkone</h2>
 
       <div className="links">
-        <Link to="/">Etusivu</Link>
+        <Link to="/koti">Etusivu</Link>
         <Link to="/kalenteri">Kalenteri</Link>
         <Link to="/koneet">Koneet</Link>
         <Link to="/yhteystiedot">Yhteystiedot</Link>
