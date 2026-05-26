@@ -169,16 +169,8 @@ function App() {
         }}
       >
         {/* VASEN */}
-        <div>
-          <img
-            src="/logo.png"
-            alt="Logo"
-            style={{
-              width: "100%",
-              maxWidth: "720px",
-              borderRadius: "10px",
-            }}
-          />
+        <div className="container">
+          <img src="/logo.png" alt="kaivurilogo"></img>
         </div>
 
         {/* OIKEA */}
