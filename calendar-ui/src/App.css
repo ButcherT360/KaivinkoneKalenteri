@@ -102,6 +102,13 @@
   border-radius: 6px;
 }
 
+.container {
+  display: flex;
+  justify-content: center; /* vaakasuora */
+  align-items: center;     /* pystysuora */
+  height: 100vh;           /* koko ruutu */
+}
+
 .navbar {
   display: flex;
   justify-content: space-between;
@@ -133,12 +140,13 @@
   border-radius: 10px;
 }
 
-
 .title-bar {
   background: #354ac2;
   color: white;
   padding: 12px 20px;
   border-radius: 8px;
+  width: 100%;
+  text-align: center;
   display: inline-block;
 }
 
