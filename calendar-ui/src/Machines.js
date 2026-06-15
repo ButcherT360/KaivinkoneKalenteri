@@ -21,7 +21,7 @@ export default function Machines() {
                         key={i}
                         src={img}
                         alt=""
-                        onClick={() => setSelectedImage(img)}
+                        onClick={() => console.log("Klikattiin:", img), setSelectedImage(img)}
                     />
                 ))}
             </div>
@@ -37,13 +37,8 @@ export default function Machines() {
                         onClick={(e) => e.stopPropagation()}
                     />
                 </div>
-            )}console.log("CLICK", img);
-
-            onClick={() => {
-                console.log("CLICK", img);
-                setSelectedImage(img);
-            }}
+            )}
         </div>
-
+        
     );
 }
