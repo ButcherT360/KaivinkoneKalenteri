@@ -54,7 +54,7 @@ export default function AdminLogin({ onLogin }) {
 
   return (
     <Layout title="Admin-kirjautuminen">
-      <div className="layout">
+      <div className="adminpage">
         <h2>Kirjaudu sisään</h2>
 
         <input
