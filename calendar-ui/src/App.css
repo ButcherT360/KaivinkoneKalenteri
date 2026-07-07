@@ -213,6 +213,13 @@ body {
   text-decoration: none;
 }
 
+.gallery-wrapper {
+  background-color: #3a3a3a;
+  border-radius: 15px;
+  padding: 30px;
+  margin: 30px auto;
+  max-width: 1500px;
+}
 
 .gallery {
   display: flex;
@@ -235,7 +242,7 @@ body {
   transform: scale(1.03);
 }
 .gallery-item {
-  background: #555;
+  background: #007694;
   padding: 15px;
   border-radius: 12px;
   box-shadow: 0 4px 10px rgba(0,0,0,.3);

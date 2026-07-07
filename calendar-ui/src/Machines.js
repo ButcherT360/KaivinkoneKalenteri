@@ -14,23 +14,23 @@ export default function Machines() {
     return (
         <div>
             <h1 className="title-bar">Vuokrattava kone ja kauhat</h1>
-
-            <div className="gallery">
-                {images.map((img, i) => (
-                    <div className="gallery-item" key={i}>
-                        <img
-                            key={i}
-                            src={img}
-                            alt=""
-                            onClick={() => {
-                                console.log("Klikattiin:", img);
-                                setSelectedImage(img);
-                            }}
-                        />
-                    </div>
-                ))}
+            <div className="gallery-wrapper">
+             <div className="gallery">
+                    {images.map((img, i) => (
+                        <div className="gallery-item" key={i}>
+                            <img
+                                key={i}
+                                src={img}
+                                alt=""
+                                onClick={() => {
+                                    console.log("Klikattiin:", img);
+                                    setSelectedImage(img);
+                                }}
+                            />
+                        </div>
+                    ))}
+                </div>
             </div>
-
             {selectedImage && (
                 <div
                     className="lightbox"
