@@ -1,5 +1,5 @@
 import { useState } from "react";
-
+import Layout from "./Layout";
 // 🌐 API URL
 const API = process.env.REACT_APP_API_URL;
 
@@ -53,36 +53,36 @@ export default function AdminLogin({ onLogin }) {
   };
 
   return (
-    <div className="layout">
+    <Layout title="Admin-kirjautuminen">
+      <div className="layout">
+        <h2>Kirjaudu sisään</h2>
 
-      <h2>Admin login</h2>
+        <input
+          type="password"
+          placeholder="Salasana"
+          value={input}
+          onChange={(e) => setInput(e.target.value)}
+          disabled={loading}
+        />
 
-      <input
-        type="password"
-        placeholder="Salasana"
-        value={input}
-        onChange={(e) => setInput(e.target.value)}
-        disabled={loading}
-      />
-
-      <button
-        onClick={login}
-        disabled={loading}
-      >
-        {loading ? "Kirjaudutaan..." : "Kirjaudu"}
-      </button>
-
-      {error && (
-        <p
-          style={{
-            color: "red",
-            marginTop: 10
-          }}
+        <button
+          onClick={login}
+          disabled={loading}
         >
-          {error}
-        </p>
-      )}
+          {loading ? "Kirjaudutaan..." : "Kirjaudu"}
+        </button>
 
-    </div>
+        {error && (
+          <p
+            style={{
+              color: "red",
+              marginTop: 10,
+            }}
+          >
+            {error}
+          </p>
+        )}
+      </div>
+    </Layout>
   );
 }
