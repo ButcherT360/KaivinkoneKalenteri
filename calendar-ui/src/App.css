@@ -203,6 +203,11 @@ body {
   background-color: #111;
 }
 
+.contact-center {
+  display: flex;
+  justify-content: center;
+  margin-top: 30px;
+}
 .contact-btn {
   display: inline-block;
   margin-top: 25px;
