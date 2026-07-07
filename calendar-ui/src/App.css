@@ -314,8 +314,9 @@ body {
   color: white;
   text-align: center;
 
-  padding: 20px;
-  margin-top: 40px;
+  padding: 12px 20px;
+  border-radius: 8px;
+  margin-top: 25px;
 
   width: 100%;
   box-sizing: border-box;
