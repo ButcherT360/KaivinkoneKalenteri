@@ -6,12 +6,11 @@ export default function Footer() {
                 <Link to="/yhteystiedot" className="contact-btn">
                     Ota yhteyttä
                 </Link>
-                <br />
-                <p>© 2026 Kaivinkonevuokraus</p>
-                {/*<p>Puhelin: </p>
-      <p>Sähköposti: </p>*/}
-            </div>
 
+            </div>
+            <p>© 2026 Kaivinkonevuokraus</p>
+                {/*<p>Puhelin: </p>
+                <p>Sähköposti: </p>*/}
         </footer>
     );
 }
