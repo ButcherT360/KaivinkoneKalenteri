@@ -97,7 +97,7 @@ function AdminPage() {
   //  ADMIN VIEW
   // ======================
   return (
-    
+
     <div className="layout">
 
       <h1 className="title-bar">Admin - Varaukset</h1>
