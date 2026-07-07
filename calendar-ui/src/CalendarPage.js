@@ -3,6 +3,7 @@ import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import interactionPlugin from "@fullcalendar/interaction";
 import fiLocale from "@fullcalendar/core/locales/fi";
+import Layout from "./Layout";
 import "./App.css";
 
 //  API URL (Vercel + Render)
@@ -10,7 +11,7 @@ const API =
   process.env.REACT_APP_API_URL ||
   "https://kaivinkonekalenteri.onrender.com";
 
-function App() {
+function CalendarPage() {
   const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(false);
 
@@ -158,104 +159,97 @@ function App() {
   }
 
   return (
-    <div style={{ padding: 20 }}>
-      <h1 className="title-bar">Kaivurin vuokrauskalenteri</h1>
+    <Layout title="Kaivurin vuokrauskalenteri">
+      <div style={{ padding: 20 }}>
+        <div className="layout">
+          {/* VASEN */}
+          <div className="left">
+            <img src="/logo.png" alt="kaivurilogo" />
+          </div>
 
-      <div className="layout"
-      >
-        {/* VASEN */}
-        <div className="left">
-          <img src="/logo.png" alt="kaivurilogo"></img>
-        </div>
+          {/* OIKEA */}
+          <div className="right">
+            {loading && <p>Ladataan varauksia...</p>}
 
-        {/* OIKEA */}
-        <div className="right">
-          {loading && <p>Ladataan varauksia...</p>}
+            <FullCalendar
+              plugins={[dayGridPlugin, interactionPlugin]}
+              initialView="dayGridMonth"
+              locale={fiLocale}
+              events={events}
+              dateClick={handleDateClick}
+              eventClick={(info) => setDeleteTarget(info.event)}
+            />
 
-          <FullCalendar
-            plugins={[dayGridPlugin, interactionPlugin]}
-            initialView="dayGridMonth"
-            locale={fiLocale}
-            events={events}
-            dateClick={handleDateClick}
-            eventClick={(info) => setDeleteTarget(info.event)}
-          />
+            <h2>Varaukset</h2>
 
-          {/* VARAUSLISTA */}
-          <h2>Varaukset</h2>
+            {events.length === 0 ? (
+              <p>Ei varauksia</p>
+            ) : (
+              events.map((event) => (
+                <div key={event.id} className="bookingItem">
+                  <strong>{event.start}</strong> – {event.title}
 
-          {events.length === 0 ? (
-            <p>Ei varauksia</p>
-          ) : (
-            events.map((event) => (
-              <div key={event.id} className="bookingItem">
-                <strong>{event.start}</strong> – {event.title}
+                  <button onClick={() => setDeleteTarget(event)}>
+                    Poista
+                  </button>
+                </div>
+              ))
+            )}
 
-                <button onClick={() => setDeleteTarget(event)}>
-                  Poista
-                </button>
+            {showModal && (
+              <div className="modalOverlay">
+                <div className="modal">
+                  <h2>Uusi varaus</h2>
 
+                  <p>Päivä: {selectedDate}</p>
+
+                  <input
+                    placeholder="Nimi"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                  />
+
+                  <input
+                    type="password"
+                    placeholder="Poistokoodi"
+                    value={deleteCode}
+                    onChange={(e) => setDeleteCode(e.target.value)}
+                  />
+
+                  <button onClick={saveBooking}>Tallenna</button>
+                  <button onClick={() => setShowModal(false)}>
+                    Peruuta
+                  </button>
+                </div>
               </div>
+            )}
 
-            ))
-          )}
+            {deleteTarget && (
+              <div className="modalOverlay">
+                <div className="modal">
+                  <h2>Poista varaus</h2>
 
-          {/* CREATE MODAL */}
-          {showModal && (
-            <div className="modalOverlay">
-              <div className="modal">
-                <h2>Uusi varaus</h2>
+                  <p>{deleteTarget.title}</p>
 
-                <p>Päivä: {selectedDate}</p>
+                  <input
+                    type="password"
+                    placeholder="Poistokoodi"
+                    value={deleteInput}
+                    onChange={(e) => setDeleteInput(e.target.value)}
+                  />
 
-                <input
-                  placeholder="Nimi"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                />
-
-                <input
-                  type="password"
-                  placeholder="Poistokoodi"
-                  value={deleteCode}
-                  onChange={(e) => setDeleteCode(e.target.value)}
-                />
-
-                <button onClick={saveBooking}>Tallenna</button>
-                <button onClick={() => setShowModal(false)}>
-                  Peruuta
-                </button>
+                  <button onClick={confirmDelete}>Poista</button>
+                  <button onClick={() => setDeleteTarget(null)}>
+                    Peruuta
+                  </button>
+                </div>
               </div>
-            </div>
-          )}
-
-          {/* DELETE MODAL */}
-          {deleteTarget && (
-            <div className="modalOverlay">
-              <div className="modal">
-                <h2>Poista varaus</h2>
-
-                <p>{deleteTarget.title}</p>
-
-                <input
-                  type="password"
-                  placeholder="Poistokoodi"
-                  value={deleteInput}
-                  onChange={(e) => setDeleteInput(e.target.value)}
-                />
-
-                <button onClick={confirmDelete}>Poista</button>
-                <button onClick={() => setDeleteTarget(null)}>
-                  Peruuta
-                </button>
-              </div>
-            </div>
-          )}
+            )}
+          </div>
         </div>
       </div>
-    </div>
-
+    </Layout>
   );
 }
 
-export default App;
+export default CalendarPage;
