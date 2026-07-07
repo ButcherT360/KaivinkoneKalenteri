@@ -15,7 +15,7 @@ export default function Machines() {
         <div>
             <h1 className="title-bar">Vuokrattava kone ja kauhat</h1>
             <div className="gallery-wrapper">
-             <div className="gallery">
+                <div className="gallery">
                     {images.map((img, i) => (
                         <div className="gallery-item" key={i}>
                             <img
@@ -42,9 +42,12 @@ export default function Machines() {
                         onClick={(e) => e.stopPropagation()}
                     />
                 </div>
-            )}<Link to="/contact" className="contact-btn">
-                Ota yhteyttä</Link>
+            )}<div className="contact-center">
+                <Link to="/yhteystiedot" className="contact-btn">
+                    Ota yhteyttä
+                </Link>
+            </div>
         </div>
-            
+
     );
 }

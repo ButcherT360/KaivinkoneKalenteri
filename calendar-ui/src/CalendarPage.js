@@ -195,9 +195,9 @@ function App() {
                 <button onClick={() => setDeleteTarget(event)}>
                   Poista
                 </button>
-                
+
               </div>
-              
+
             ))
           )}
 
@@ -254,11 +254,13 @@ function App() {
           )}
         </div>
       </div>
-              <Link to="/contact" className="contact-btn">
-                Ota yhteyttä</Link>
-                
+      <div className="contact-center">
+        <Link to="/yhteystiedot" className="contact-btn">
+          Ota yhteyttä
+        </Link>
+      </div>
     </div>
-    
+
   );
 }
 
