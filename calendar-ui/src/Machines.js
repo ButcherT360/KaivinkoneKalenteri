@@ -17,15 +17,17 @@ export default function Machines() {
 
             <div className="gallery">
                 {images.map((img, i) => (
-                    <img
-                        key={i}
-                        src={img}
-                        alt=""
-                        onClick={() => { 
-                            console.log("Klikattiin:", img); 
-                            setSelectedImage(img);
-                        }}
-                    />
+                    <div className="gallery-item" key={i}>
+                        <img
+                            key={i}
+                            src={img}
+                            alt=""
+                            onClick={() => {
+                                console.log("Klikattiin:", img);
+                                setSelectedImage(img);
+                            }}
+                        />
+                    </div>
                 ))}
             </div>
 
@@ -42,6 +44,6 @@ export default function Machines() {
                 </div>
             )}
         </div>
-        
+
     );
 }

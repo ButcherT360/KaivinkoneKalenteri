@@ -234,6 +234,20 @@ body {
 .gallery img:hover {
   transform: scale(1.03);
 }
+.gallery-item {
+  background: #555;
+  padding: 15px;
+  border-radius: 12px;
+  box-shadow: 0 4px 10px rgba(0,0,0,.3);
+}
+
+.gallery-item img {
+  width: 300px;
+  height: 220px;
+  object-fit: cover;
+  border-radius: 8px;
+  cursor: pointer;
+}
 
 .lightbox {
   position: fixed;
