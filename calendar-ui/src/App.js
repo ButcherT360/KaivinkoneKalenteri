@@ -6,6 +6,7 @@ import CalendarPage from "./CalendarPage";
 import AdminPage from "./AdminPage";
 import Contact from "./Contact";
 import Machines from "./Machines";
+import Footer from "./Footer";
 
 function App() {
   return (
