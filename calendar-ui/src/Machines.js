@@ -42,11 +42,7 @@ export default function Machines() {
                         onClick={(e) => e.stopPropagation()}
                     />
                 </div>
-            )}<div className="contact-center">
-                <Link to="/yhteystiedot" className="contact-btn">
-                    Ota yhteyttä
-                </Link>
-            </div>
+            )}
         </div>
 
     );

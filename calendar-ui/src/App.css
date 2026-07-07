@@ -309,7 +309,17 @@ body {
   text-align: center;
   display: inline-block;
 }
+.footer {
+  background: #354ac2;
+  color: white;
+  text-align: center;
 
+  padding: 20px;
+  margin-top: 40px;
+
+  width: 100%;
+  box-sizing: border-box;
+}
 @keyframes App-logo-spin {
   from {
     transform: rotate(0deg);

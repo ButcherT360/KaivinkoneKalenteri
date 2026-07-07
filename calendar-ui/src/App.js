@@ -26,6 +26,7 @@ function App() {
         {/* fallback */}
         <Route path="*" element={<h2>404 - Sivua ei löydy</h2>} />
       </Routes>
+      <Footer />
     </BrowserRouter>
   );
 }

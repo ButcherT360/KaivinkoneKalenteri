@@ -6,11 +6,6 @@ export default function Home() {
             <div className="container">
                 <img src="/logo.png" alt="kaivurilogo" />
             </div>
-            <div className="contact-center">
-                <Link to="/yhteystiedot" className="contact-btn">
-                    Ota yhteyttä
-                </Link>
-            </div>
         </div>
     );
 }
