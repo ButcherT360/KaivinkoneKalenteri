@@ -1,34 +1,28 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 
-import Navbar from "./Navbar";
 import Home from "./Home";
 import CalendarPage from "./CalendarPage";
 import AdminPage from "./AdminPage";
 import Contact from "./Contact";
 import Machines from "./Machines";
-import Footer from "./Footer";
-import Layout from "./Layout";
 
 function App() {
   return (
     <BrowserRouter>
-      <Navbar />
-
       <Routes>
-        {/* redirect root → home */}
+        {/* Ohjaa etusivulle */}
         <Route path="/" element={<Navigate to="/koti" />} />
 
-        {/* sivut */}
+        {/* Sivut */}
         <Route path="/koti" element={<Home />} />
         <Route path="/kalenteri" element={<CalendarPage />} />
         <Route path="/yhteystiedot" element={<Contact />} />
         <Route path="/admin" element={<AdminPage />} />
         <Route path="/koneet" element={<Machines />} />
 
-        {/* fallback */}
+        {/* Virhesivu */}
         <Route path="*" element={<h2>404 - Sivua ei löydy</h2>} />
       </Routes>
-      <Footer />
     </BrowserRouter>
   );
 }
