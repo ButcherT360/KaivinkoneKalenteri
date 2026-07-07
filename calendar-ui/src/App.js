@@ -7,6 +7,7 @@ import AdminPage from "./AdminPage";
 import Contact from "./Contact";
 import Machines from "./Machines";
 import Footer from "./Footer";
+import Footer from "./Layout";
 
 function App() {
   return (

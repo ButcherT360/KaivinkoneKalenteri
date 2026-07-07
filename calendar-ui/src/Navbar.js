@@ -1,9 +1,10 @@
 import { Link } from "react-router-dom";
 
+<h1 className="title-bar">Kaivinkone vuokraus </h1>
 export default function Navbar() {
   return (
       <nav className="navbar">
-        <h2>Kaivinkone vuokraus</h2>
+        
 
         <div className="links">
           <Link to="/koti">Etusivu</Link>
