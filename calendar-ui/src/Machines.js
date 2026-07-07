@@ -1,5 +1,5 @@
 import { useState } from "react";
-
+import { Link } from "react-router-dom";
 export default function Machines() {
     const [selectedImage, setSelectedImage] = useState(null);
 
@@ -42,8 +42,9 @@ export default function Machines() {
                         onClick={(e) => e.stopPropagation()}
                     />
                 </div>
-            )}
+            )}<Link to="/contact" className="contact-btn">
+                Ota yhteyttä</Link>
         </div>
-
+            
     );
 }

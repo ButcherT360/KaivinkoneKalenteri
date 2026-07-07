@@ -203,6 +203,27 @@ body {
   background-color: #111;
 }
 
+.contact-btn {
+  display: inline-block;
+  margin-top: 25px;
+  padding: 12px 24px;
+
+  background-color: #354ac2;
+  color: white;
+  text-decoration: none;
+
+  border-radius: 8px;
+  font-size: 18px;
+  font-weight: bold;
+
+  transition: 0.2s;
+}
+
+.contact-btn:hover {
+  background-color: #26389c;
+  transform: translateY(-2px);
+}
+
 .links {
   display: flex;
   gap: 15px;

@@ -1,4 +1,5 @@
 import { useEffect, useState, useMemo } from "react";
+import { Link } from "react-router-dom";
 import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import interactionPlugin from "@fullcalendar/interaction";
@@ -194,7 +195,9 @@ function App() {
                 <button onClick={() => setDeleteTarget(event)}>
                   Poista
                 </button>
+                
               </div>
+              
             ))
           )}
 
@@ -251,7 +254,11 @@ function App() {
           )}
         </div>
       </div>
+              <Link to="/contact" className="contact-btn">
+                Ota yhteyttä</Link>
+                
     </div>
+    
   );
 }
 

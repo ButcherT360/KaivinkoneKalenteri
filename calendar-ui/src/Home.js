@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 export default function Home() {
     return (
         <div>
@@ -5,6 +6,8 @@ export default function Home() {
             <div className="container">
                 <img src="/logo.png" alt="kaivurilogo" />
             </div>
+            <Link to="/contact" className="contact-btn">
+                Ota yhteyttä</Link>
         </div>
     );
 }
